@@ -1,0 +1,8 @@
+-- Memoirium profile auth helper
+--
+-- Profile auto-creation is now included in supabase/schema.sql through:
+-- - public.handle_new_user_profile()
+-- - trigger on auth.users
+--
+-- Run supabase/schema.sql in the Supabase SQL Editor for the complete
+-- production database, RLS, trigger, and storage policy setup.
