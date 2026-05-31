@@ -14,10 +14,38 @@ export function Landing() {
   ];
 
   const steps = [
-    { number: "01", title: "Create Collection", description: "Start by creating a themed collection for your memories" },
-    { number: "02", title: "Add Memories", description: "Upload photos, write stories, and tag emotions" },
-    { number: "03", title: "Explore Your Museum", description: "Navigate your memories in an elegant gallery interface" },
-    { number: "04", title: "Share With Others", description: "Invite others to experience your personal museum" }
+    {
+      number: "01",
+      title: "Create Collection",
+      description: "Start by creating a themed collection for your memories",
+      image:
+        "https://images.unsplash.com/photo-1620496866641-af6f9aef5131?auto=format&fit=crop&w=1200&q=85",
+      imageAlt: "Museum gallery with framed artwork and warm architectural light"
+    },
+    {
+      number: "02",
+      title: "Add Memories",
+      description: "Upload photos, write stories, and tag emotions",
+      image:
+        "https://images.unsplash.com/photo-1516981879613-9f5da904015f?auto=format&fit=crop&w=1200&q=85",
+      imageAlt: "Vintage photographs arranged as personal memories"
+    },
+    {
+      number: "03",
+      title: "Explore Your Museum",
+      description: "Navigate your memories in an elegant gallery interface",
+      image:
+        "https://images.unsplash.com/photo-1545987796-200677ee1011?auto=format&fit=crop&w=1200&q=85",
+      imageAlt: "Modern digital exhibition with immersive illuminated displays"
+    },
+    {
+      number: "04",
+      title: "Share With Others",
+      description: "Invite others to experience your personal museum",
+      image:
+        "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1200&q=85",
+      imageAlt: "People gathered together sharing an experience"
+    }
   ];
 
   return (
@@ -52,9 +80,9 @@ export function Landing() {
                 <Landmark size={20} />
                 Enter Museum
               </Button>
-              <Button variant="secondary" size="lg" onClick={() => navigate("/museum/demo")}>
+              <Button variant="secondary" size="lg" onClick={() => navigate("/discover")}>
                 <Share2 size={20} />
-                View Demo Museum
+                Explore Public Museums
               </Button>
             </div>
           </motion.div>
@@ -132,8 +160,19 @@ export function Landing() {
                     {step.description}
                   </p>
                 </div>
-                <div className="flex-1 aspect-video bg-[var(--surface)] border border-[var(--border)] rounded-lg"
-                     style={{ boxShadow: "0 4px 24px rgba(0, 0, 0, 0.3)" }} />
+                <div
+                  className="group relative flex-1 aspect-video overflow-hidden rounded-lg border border-[var(--gold-primary)]/60 bg-[var(--surface)]"
+                  style={{ boxShadow: "0 4px 24px rgba(0, 0, 0, 0.3)" }}
+                >
+                  <img
+                    src={step.image}
+                    alt={step.imageAlt}
+                    loading="lazy"
+                    className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                  />
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
+                  <div className="pointer-events-none absolute inset-0 rounded-lg ring-1 ring-inset ring-[var(--gold-secondary)]/20" />
+                </div>
               </motion.div>
             ))}
           </div>

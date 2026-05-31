@@ -1,12 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "motion/react";
-import { Copy, ExternalLink, Eye, EyeOff, Save, Settings as SettingsIcon, User } from "lucide-react";
+import { Award, Copy, ExternalLink, Eye, EyeOff, Save, Settings as SettingsIcon, User } from "lucide-react";
 import { Sidebar } from "../components/Sidebar";
 import { Navbar } from "../components/Navbar";
 import { Button } from "../components/Button";
 import { useAuth } from "../auth/AuthContext";
 import { getCurrentProfile, updateProfile } from "../services/profiles";
-import type { Profile } from "../types/memoirium";
+import { getUserCollections } from "../services/collections";
+import { getUserMemories } from "../services/memories";
+import { getMuseumAchievements } from "../services/achievements";
+import type { Collection, Memory, Profile } from "../types/memoirium";
 
 type SettingsForm = {
   display_name: string;
@@ -49,6 +52,8 @@ function getFriendlyProfileError(message: string) {
 export function Settings() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [collections, setCollections] = useState<Collection[]>([]);
+  const [memories, setMemories] = useState<Memory[]>([]);
   const [form, setForm] = useState<SettingsForm>(emptyForm);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -61,6 +66,11 @@ export function Settings() {
     if (typeof window === "undefined") return publicMuseumPath;
     return `${window.location.origin}${publicMuseumPath}`;
   }, [publicMuseumPath]);
+  const achievements = useMemo(
+    () => getMuseumAchievements({ profile, collections, memories }),
+    [collections, memories, profile],
+  );
+  const unlockedAchievements = achievements.filter((achievement) => achievement.unlocked).length;
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -70,8 +80,14 @@ export function Settings() {
       setError("");
 
       try {
-        const data = await getCurrentProfile(user.id);
+        const [data, collectionData, memoryData] = await Promise.all([
+          getCurrentProfile(user.id),
+          getUserCollections(user.id),
+          getUserMemories(user.id),
+        ]);
         setProfile(data);
+        setCollections(collectionData);
+        setMemories(memoryData);
         setForm(
           data
             ? {
@@ -326,6 +342,27 @@ export function Settings() {
                   <div className="mb-6 rounded-lg border border-[var(--gold-primary)]/25 bg-black/25 p-4">
                     <p className="mb-2 text-xs uppercase tracking-wider text-[var(--text-secondary)]">Museum Link</p>
                     <p className="break-all text-sm text-[var(--gold-secondary)]">{publicMuseumPath}</p>
+                  </div>
+
+                  <div className="mb-6 rounded-lg border border-[var(--gold-primary)]/25 bg-[var(--gold-primary)]/10 p-4">
+                    <div className="mb-3 flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--gold-primary)]/30 bg-black/25">
+                        <Award size={21} className="text-[var(--gold-primary)]" />
+                      </div>
+                      <div>
+                        <p className="text-xs uppercase tracking-wider text-[var(--text-secondary)]">
+                          Achievement Progress
+                        </p>
+                        <p className="text-lg text-[var(--gold-primary)]">
+                          {unlockedAchievements} / {achievements.length} unlocked
+                        </p>
+                      </div>
+                    </div>
+                    {!form.is_public && (
+                      <p className="text-sm leading-relaxed text-[var(--text-secondary)]">
+                        Publish your museum to unlock the Public Museum Published badge.
+                      </p>
+                    )}
                   </div>
 
                   <div className="space-y-3">

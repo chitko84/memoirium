@@ -16,6 +16,7 @@ import {
   uploadMemoryImage,
 } from "../services/memories";
 import { MemoryFormModal, type MemoryFormState } from "../components/MemoryFormModal";
+import { generateCuratorNote } from "../services/curatorNotes";
 
 function slugify(value: string) {
   return (
@@ -262,6 +263,11 @@ export function MemoryDetails() {
                       {isDeleting ? "Deleting" : "Delete"}
                     </Button>
                   </div>
+                </div>
+
+                <div className="rounded-lg border border-[var(--gold-primary)]/25 bg-[var(--surface)] p-6">
+                  <p className="mb-3 text-xs uppercase tracking-[0.28em] text-[var(--gold-secondary)]">Curator's Note</p>
+                  <p className="text-lg leading-relaxed text-[var(--text-secondary)]">{generateCuratorNote(memory)}</p>
                 </div>
 
                 <div className="border-t border-[var(--border)] pt-8">

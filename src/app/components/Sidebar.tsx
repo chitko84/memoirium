@@ -1,4 +1,4 @@
-import { LayoutDashboard, FolderOpen, Clock, Landmark, Settings, X, LogOut, Cuboid } from "lucide-react";
+import { LayoutDashboard, FolderOpen, Clock, Landmark, Settings, X, LogOut, Cuboid, MapPin } from "lucide-react";
 import { useNavigate, useLocation } from "react-router";
 import { useAuth } from "../auth/AuthContext";
 
@@ -12,6 +12,7 @@ const menuItems = [
   { icon: FolderOpen, label: "Collections", path: "/collections" },
   { icon: Clock, label: "Timeline", path: "/timeline" },
   { icon: Cuboid, label: "Museum Gallery", path: "/gallery" },
+  { icon: MapPin, label: "Memory Map", path: "/map" },
   { icon: Landmark, label: "Museum", path: "/museum" },
   { icon: Settings, label: "Settings", path: "/settings" }
 ];

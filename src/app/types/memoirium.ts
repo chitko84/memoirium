@@ -65,3 +65,26 @@ export type MuseumVisit = {
   visitor_hash: string | null;
   visited_at: string;
 };
+
+export type MuseumGuestbookEntry = {
+  id: string;
+  profile_id: string | null;
+  visitor_name: string;
+  message: string;
+  created_at: string;
+};
+
+export type MemoryLike = {
+  id: string;
+  memory_id: string | null;
+  visitor_hash: string;
+  created_at: string;
+};
+
+export type MemoryComment = {
+  id: string;
+  memory_id: string | null;
+  visitor_name: string;
+  comment: string;
+  created_at: string;
+};

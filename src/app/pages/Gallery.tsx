@@ -15,10 +15,13 @@ import {
 import { Sidebar } from "../components/Sidebar";
 import { Navbar } from "../components/Navbar";
 import { Button } from "../components/Button";
+import { GuidedTourOverlay } from "../components/GuidedTourOverlay";
+import { MuseumAudioControl } from "../components/MuseumAudioControl";
 import { useAuth } from "../auth/AuthContext";
 import { getUserMemories } from "../services/memories";
 import { getUserCollections } from "../services/collections";
 import type { Collection, Memory } from "../types/memoirium";
+import { generateCuratorNote } from "../services/curatorNotes";
 
 type SortMode = "newest" | "oldest";
 
@@ -87,11 +90,13 @@ function ArtworkFrame({
   side,
   index,
   onOpen,
+  isTourActive = false,
 }: {
   memory: Memory;
   side: "left" | "right";
   index: number;
   onOpen: () => void;
+  isTourActive?: boolean;
 }) {
   const rotation = side === "left" ? "rotateY(22deg)" : "rotateY(-22deg)";
   const glow = getEmotionGlow(memory.emotion);
@@ -104,7 +109,10 @@ function ArtworkFrame({
       transition={{ delay: index * 0.08 }}
       whileHover={{ y: -10, scale: 1.035 }}
       onClick={onOpen}
-      className="group block w-full text-left"
+      data-tour-artifact={memory.id}
+      className={`group block w-full text-left transition-all duration-300 ${
+        isTourActive ? "ring-2 ring-[var(--gold-primary)] ring-offset-4 ring-offset-black" : ""
+      }`}
       style={{ transformStyle: "preserve-3d" }}
     >
       <div
@@ -213,6 +221,11 @@ function MemoryPreviewOverlay({
 
             <p className="mb-8 text-[var(--text-secondary)] leading-relaxed">{storyPreview(memory.story)}</p>
 
+            <div className="mb-8 border-l border-[var(--gold-primary)]/45 pl-4">
+              <p className="mb-2 text-xs uppercase tracking-[0.28em] text-[var(--gold-secondary)]">Curator's Note</p>
+              <p className="text-sm leading-relaxed text-[var(--text-secondary)]">{generateCuratorNote(memory)}</p>
+            </div>
+
             <div className="flex flex-col sm:flex-row gap-3">
               <Button variant="primary" onClick={onViewFull}>
                 <Eye size={18} />
@@ -239,6 +252,7 @@ export function Gallery() {
   const [collectionFilter, setCollectionFilter] = useState("all");
   const [sortMode, setSortMode] = useState<SortMode>("newest");
   const [focusedMemory, setFocusedMemory] = useState<Memory | null>(null);
+  const [tourIndex, setTourIndex] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const { user } = useAuth();
@@ -287,8 +301,53 @@ export function Gallery() {
   const focusedCollection = focusedMemory?.collection_id
     ? collections.find((collection) => collection.id === focusedMemory.collection_id)
     : undefined;
+  const tourMemory = tourIndex === null ? null : filteredMemories[tourIndex] ?? null;
 
   const showCorridor = hasEntered && !isLoading && !error && memories.length > 0;
+
+  useEffect(() => {
+    if (tourIndex === null) return;
+
+    if (filteredMemories.length === 0) {
+      setTourIndex(null);
+      return;
+    }
+
+    if (tourIndex > filteredMemories.length - 1) {
+      setTourIndex(filteredMemories.length - 1);
+    }
+  }, [filteredMemories, tourIndex]);
+
+  useEffect(() => {
+    if (!tourMemory) return;
+
+    const visibleArtifact = Array.from(
+      document.querySelectorAll<HTMLElement>(`[data-tour-artifact="${tourMemory.id}"]`),
+    ).find((element) => element.offsetParent !== null);
+
+    visibleArtifact?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [tourMemory]);
+
+  const startGuidedTour = () => {
+    if (filteredMemories.length === 0) return;
+
+    setHasEntered(true);
+    setTourIndex(0);
+  };
+
+  const goToPreviousTourMemory = () => {
+    setTourIndex((current) => {
+      if (current === null || filteredMemories.length === 0) return current;
+      return current === 0 ? filteredMemories.length - 1 : current - 1;
+    });
+  };
+
+  const goToNextTourMemory = () => {
+    setTourIndex((current) => {
+      if (current === null || filteredMemories.length === 0) return current;
+      return current === filteredMemories.length - 1 ? 0 : current + 1;
+    });
+  };
 
   return (
     <div className="flex min-h-screen bg-[var(--background)]">
@@ -322,9 +381,12 @@ export function Gallery() {
                   Immersive Archive
                 </div>
                 <h1 className="text-5xl mb-3 text-[var(--gold-primary)]">Museum Gallery</h1>
-                <p className="text-lg text-[var(--text-secondary)]">
-                  Walk through your memories as curated artifacts.
-                </p>
+                <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+                  <p className="text-lg text-[var(--text-secondary)]">
+                    Walk through your memories as curated artifacts.
+                  </p>
+                  <MuseumAudioControl />
+                </div>
               </motion.div>
             </div>
           </section>
@@ -385,6 +447,16 @@ export function Gallery() {
                     <Film size={20} />
                     Enter Gallery
                   </Button>
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    onClick={startGuidedTour}
+                    className="ml-0 mt-3 sm:ml-3 sm:mt-0"
+                    disabled={filteredMemories.length === 0}
+                  >
+                    <Sparkles size={20} />
+                    Start Guided Tour
+                  </Button>
                 </div>
               </motion.div>
             </section>
@@ -398,7 +470,7 @@ export function Gallery() {
                 transition={{ duration: 0.8 }}
                 className="px-6 lg:px-8 pb-8"
               >
-                <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-4 rounded-lg border border-[var(--border)] bg-[var(--surface)] p-4">
+                <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_auto_auto] gap-4 rounded-lg border border-[var(--border)] bg-[var(--surface)] p-4">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                     <select
                       value={emotionFilter}
@@ -436,6 +508,10 @@ export function Gallery() {
                   <Button variant={cinematicMode ? "primary" : "outline"} onClick={() => setCinematicMode((current) => !current)}>
                     <Film size={18} />
                     {cinematicMode ? "Exit Cinematic" : "Cinematic Mode"}
+                  </Button>
+                  <Button variant="primary" onClick={startGuidedTour} disabled={filteredMemories.length === 0}>
+                    <Sparkles size={18} />
+                    Start Guided Tour
                   </Button>
                 </div>
               </motion.section>
@@ -493,6 +569,7 @@ export function Gallery() {
                               side="left"
                               index={index}
                               onOpen={() => setFocusedMemory(memory)}
+                              isTourActive={tourMemory?.id === memory.id}
                             />
                           ))}
                         </div>
@@ -518,6 +595,7 @@ export function Gallery() {
                               side="right"
                               index={index}
                               onOpen={() => setFocusedMemory(memory)}
+                              isTourActive={tourMemory?.id === memory.id}
                             />
                           ))}
                         </div>
@@ -535,7 +613,12 @@ export function Gallery() {
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: index * 0.05 }}
                           onClick={() => setFocusedMemory(memory)}
-                          className="block w-full border border-[var(--gold-primary)]/30 bg-[var(--surface)] p-3 text-left"
+                          data-tour-artifact={memory.id}
+                          className={`block w-full border bg-[var(--surface)] p-3 text-left transition-all duration-300 ${
+                            tourMemory?.id === memory.id
+                              ? "border-[var(--gold-primary)] ring-2 ring-[var(--gold-primary)]"
+                              : "border-[var(--gold-primary)]/30"
+                          }`}
                           style={{ boxShadow: `0 0 30px ${getEmotionGlow(memory.emotion)}` }}
                         >
                           <div className="aspect-[4/3] overflow-hidden bg-[var(--surface-light)]">
@@ -573,6 +656,18 @@ export function Gallery() {
           collection={focusedCollection}
           onClose={() => setFocusedMemory(null)}
           onViewFull={() => navigate(`/memory/${focusedMemory.id}`)}
+        />
+      )}
+
+      {tourMemory && (
+        <GuidedTourOverlay
+          memory={tourMemory}
+          currentStep={tourIndex === null ? 1 : tourIndex + 1}
+          totalSteps={filteredMemories.length}
+          onPrevious={goToPreviousTourMemory}
+          onNext={goToNextTourMemory}
+          onEnd={() => setTourIndex(null)}
+          onViewFull={() => navigate(`/memory/${tourMemory.id}`)}
         />
       )}
     </div>

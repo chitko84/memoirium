@@ -41,6 +41,17 @@ Use this checklist after running `supabase/schema.sql` and configuring `.env`.
 - Confirm real memories are grouped by year and sorted by date.
 - Confirm empty state appears for a new account with no memories.
 
+## Memory Map
+
+- Open `/map` while logged in.
+- Confirm memories are grouped by real location text only.
+- Confirm each location card shows location name, memory count, latest memory title, latest memory date, and emotions found there.
+- Click a location card and confirm its real memories expand.
+- Click an expanded memory and confirm `/memory/:id` opens.
+- Confirm memories without location do not appear on the map.
+- Confirm a new account or account with no located memories shows the empty state encouraging location details.
+- Confirm `/map` redirects to `/login` after logout.
+
 ## Museum Gallery
 
 - Open `/gallery`.
@@ -48,6 +59,12 @@ Use this checklist after running `supabase/schema.sql` and configuring `.env`.
 - Test emotion filter, exhibition room filter, newest/oldest sort, and cinematic mode.
 - Click an artifact and confirm the preview overlay opens.
 - Use “View Full Artifact” and confirm `/memory/:id` opens.
+- Confirm “Curator’s Note” appears in the artifact preview overlay.
+- Start Guided Tour and confirm it walks through the currently filtered/sorted memories.
+- Confirm the current guided-tour artifact is highlighted in the gallery.
+- Test guided-tour Previous, Next, End Tour, View Full Artifact, ArrowLeft, ArrowRight, and Escape controls.
+- Confirm Start Guided Tour is disabled or harmless when no memories match the current filters.
+- Confirm the ambient audio control is off by default, does not autoplay, and shows an “Add audio file” state when `public/audio/museum-ambient.mp3` is missing.
 - Confirm mobile layout stacks cleanly.
 
 ## Public Museum
@@ -56,10 +73,47 @@ Use this checklist after running `supabase/schema.sql` and configuring `.env`.
 - Confirm public profile, public rooms, public memories, featured artifacts, and stats appear.
 - Confirm private rooms and private memories are hidden.
 - Confirm missing/private museum usernames show a not-found state.
+- Start Public Tour and confirm it uses only visible public memories.
+- Confirm public guided-tour Previous, Next, End Tour, View Full Artifact, ArrowLeft, ArrowRight, and Escape controls work.
+- Confirm the current public guided-tour artifact is highlighted on the public museum page.
+- Confirm public memory cards show “Curator’s Note” without exposing private data.
+- Confirm the public museum ambient audio control is off by default and requires a click to play.
+- Confirm the public Memory Map section shows only public memories with location.
+- Confirm private memories and private-room memories do not appear in public Memory Map cards or expanded lists.
+
+## Achievements
+
+- Open `/dashboard` and confirm Museum Achievements appears.
+- Confirm achievement progress values match real profile, collections, memories, dates, images, featured flags, public status, and locations.
+- Add the first collection and confirm First Exhibition Room unlocks.
+- Add the first memory and confirm First Artifact unlocks.
+- Mark the profile public and confirm Public Museum Published unlocks.
+- Add memories with three different locations and confirm World Memory Keeper unlocks.
+- Open `/settings` and confirm the achievement summary shows unlocked count / total achievements.
+- With the museum private, confirm Settings prompts the curator to publish for the public badge.
+
+## Memory Details
+
+- Open a memory detail page.
+- Confirm “Curator’s Note” appears above the story and is generated from the real memory fields.
+
+## Public Engagement
+
+- Run `supabase/phase5-engagement.sql` after the base schema.
+- Open a public museum while logged out and sign the guestbook with a name and message.
+- Refresh the page and confirm the guestbook entry remains visible.
+- Try submitting an empty guestbook form and confirm validation appears without saving.
+- Like a featured artifact and a room memory card, then refresh and confirm counts persist.
+- Like the same memory again from the same browser and confirm it does not create duplicate likes.
+- Expand comments under a public memory, add a visitor comment, and confirm it appears.
+- Confirm guestbook, likes, and comments are unavailable for private profiles or private memories.
+- Log in as the museum owner and confirm RLS allows deleting own guestbook entries and comments through service calls.
 
 ## Privacy Checks
 
 - Account A should not see Account B private dashboard data.
 - Account A should not load Account B private collection or memory detail routes.
 - Public museum should only show data where owner profile is public and records are public.
+- Public Memory Map should only show public memories owned by a public profile.
+- Private `/map` should only show the authenticated curator’s own memories.
 - Storage uploads should be under `auth.uid()/filename`.

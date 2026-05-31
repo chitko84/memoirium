@@ -56,6 +56,26 @@ npm install
 npm run dev
 ```
 
+## Optional Ambient Audio
+
+Memoirium includes a museum ambience control on `/gallery` and public museums. Audio is off by default and never autoplays. To enable it, place an MP3 file at:
+
+```txt
+public/audio/museum-ambient.mp3
+```
+
+If the file is missing, the control renders a disabled “Add audio file” state.
+
+## Phase 5 Features
+
+- Visitor guestbook for public museums.
+- Memory likes and visitor comments.
+- Guided tours for private galleries and public museums.
+- Optional ambient audio.
+- Rule-based, AI-ready curator notes.
+- Private and public Memory Map experiences.
+- Local museum achievement system.
+
 ## Production Checks
 
 ```bash

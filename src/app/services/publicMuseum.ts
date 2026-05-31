@@ -1,5 +1,6 @@
 import { supabase } from "../lib/supabase";
 import type { Collection, Memory, Profile } from "../types/memoirium";
+import { getAnonymousVisitorId } from "./visitorIdentity";
 
 function requireSupabase() {
   if (!supabase) {
@@ -67,16 +68,10 @@ export async function getPublicMemoriesByCollection(collectionId: string) {
 
 export async function recordMuseumVisit(profileId: string) {
   const client = requireSupabase();
-  const visitorKey = `memoirium-visitor-${profileId}`;
-  const visitorId =
-    window.localStorage.getItem(visitorKey) ??
-    `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-
-  window.localStorage.setItem(visitorKey, visitorId);
 
   const { error } = await client.from("museum_visits").insert({
     profile_id: profileId,
-    visitor_hash: visitorId,
+    visitor_hash: getAnonymousVisitorId(),
   });
 
   if (error) throw error;
