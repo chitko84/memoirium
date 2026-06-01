@@ -17,7 +17,7 @@ import {
   Plus,
   Sparkles,
 } from "lucide-react";
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
 import { useNavigate } from "react-router";
 import { useAuth } from "../auth/AuthContext";
 import { getUserCollections } from "../services/collections";

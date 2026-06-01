@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { FormEvent } from "react";
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
 import { useNavigate, useParams } from "react-router";
 import { Button } from "../components/Button";
 import { Card } from "../components/Card";

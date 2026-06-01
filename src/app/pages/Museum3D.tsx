@@ -5,7 +5,7 @@ import type { ThreeEvent } from "@react-three/fiber";
 import { OrbitControls, Text } from "@react-three/drei";
 import * as THREE from "three";
 import { ArrowLeft, Calendar, ChevronLeft, ChevronRight, Cuboid, DoorOpen, Eye, Heart, Images, MapPin, Monitor, Plus, X } from "lucide-react";
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
 import { useNavigate } from "react-router";
 import { Sidebar } from "../components/Sidebar";
 import { Navbar } from "../components/Navbar";

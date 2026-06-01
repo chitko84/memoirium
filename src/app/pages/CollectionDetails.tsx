@@ -4,7 +4,7 @@ import { Navbar } from "../components/Navbar";
 import { Card } from "../components/Card";
 import { Button } from "../components/Button";
 import { ArrowLeft, Calendar, Heart, Images, MapPin, Plus } from "lucide-react";
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
 import { useNavigate, useParams } from "react-router";
 import { useAuth } from "../auth/AuthContext";
 import { getCollectionById } from "../services/collections";

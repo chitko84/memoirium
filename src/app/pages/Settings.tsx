@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
 import { Award, Copy, ExternalLink, Eye, EyeOff, Save, Settings as SettingsIcon, User } from "lucide-react";
 import { Sidebar } from "../components/Sidebar";
 import { Navbar } from "../components/Navbar";

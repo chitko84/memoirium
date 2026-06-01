@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
 import { Button } from "../components/Button";
 import { useNavigate } from "react-router";
 import { Landmark } from "lucide-react";

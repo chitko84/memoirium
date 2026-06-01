@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
 import { Calendar, FolderOpen, Images, MapPin, Plus, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router";
 import { Sidebar } from "../components/Sidebar";

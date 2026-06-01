@@ -1,4 +1,4 @@
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
 import { Button } from "../components/Button";
 import { useNavigate } from "react-router";
 import { Landmark, BookOpen, Users, Heart, Camera, Archive, Share2 } from "lucide-react";

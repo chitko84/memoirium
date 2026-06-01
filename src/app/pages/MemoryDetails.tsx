@@ -3,7 +3,7 @@ import { Sidebar } from "../components/Sidebar";
 import { Navbar } from "../components/Navbar";
 import { Button } from "../components/Button";
 import { ArrowLeft, Calendar, Edit3, Folder, Heart, Images, MapPin, Trash2 } from "lucide-react";
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
 import { useNavigate, useParams } from "react-router";
 import { useAuth } from "../auth/AuthContext";
 import type { Collection, Memory } from "../types/memoirium";

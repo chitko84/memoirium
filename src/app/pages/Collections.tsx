@@ -4,7 +4,7 @@ import { Navbar } from "../components/Navbar";
 import { Card } from "../components/Card";
 import { Button } from "../components/Button";
 import { Edit3, Images, Plus, Trash2, X } from "lucide-react";
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
 import { useNavigate } from "react-router";
 import { useAuth } from "../auth/AuthContext";
 import type { Collection } from "../types/memoirium";

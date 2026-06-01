@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Calendar, Eye, MapPin, Sparkles, X } from "lucide-react";
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
 import type { Memory } from "../types/memoirium";
 import { Button } from "./Button";
 import { generateCuratorNote } from "../services/curatorNotes";

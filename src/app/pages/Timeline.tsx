@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Sidebar } from "../components/Sidebar";
 import { Navbar } from "../components/Navbar";
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
 import { useNavigate } from "react-router";
 import { Calendar, Heart, Images } from "lucide-react";
 import { useAuth } from "../auth/AuthContext";
