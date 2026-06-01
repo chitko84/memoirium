@@ -172,10 +172,14 @@ function useImageTexture(memoryTitle: string, imageUrl: string | null) {
   const [status, setStatus] = useState<TextureStatus>("idle");
 
   useEffect(() => {
+    setTexture((current) => {
+      current?.dispose();
+      return null;
+    });
+
     if (!imageUrl) {
       console.warn("Museum3D memory has no image_url", memoryTitle);
       setStatus("missing");
-      setTexture(null);
       return;
     }
 
@@ -196,6 +200,8 @@ function useImageTexture(memoryTitle: string, imageUrl: string | null) {
         loaded.anisotropy = 8;
         loaded.minFilter = THREE.LinearMipmapLinearFilter;
         loaded.magFilter = THREE.LinearFilter;
+        loaded.wrapS = THREE.ClampToEdgeWrapping;
+        loaded.wrapT = THREE.ClampToEdgeWrapping;
         loaded.needsUpdate = true;
         setTexture(loaded);
         setStatus("loaded");
@@ -214,15 +220,23 @@ function useImageTexture(memoryTitle: string, imageUrl: string | null) {
       cancelled = true;
       loadedTexture.dispose();
       setTexture((current) => {
-        if (current !== loadedTexture) {
-          current?.dispose();
-        }
+        current?.dispose();
         return null;
       });
     };
   }, [imageUrl, memoryTitle]);
 
   return { texture, status };
+}
+
+function getTextureAspect(texture: THREE.Texture | null) {
+  const image = texture?.image as { width?: number; height?: number } | undefined;
+
+  if (!image?.width || !image.height) {
+    return 1.62 / 1.1;
+  }
+
+  return image.width / image.height;
 }
 
 function ArtifactFrame({
@@ -241,6 +255,9 @@ function ArtifactFrame({
   const imageUrl = getValidImageUrl(memory.image_url);
   const { texture, status } = useImageTexture(memory.title, imageUrl);
   const showFallback = !texture && status !== "loading";
+  const imageAspect = getTextureAspect(texture);
+  const imageHeight = imageAspect >= 1.62 / 1.1 ? 1.62 / imageAspect : 1.1;
+  const imageWidth = imageAspect >= 1.62 / 1.1 ? 1.62 : 1.1 * imageAspect;
   const frameEmissive = isHighlighted ? "#d4af37" : "#000000";
   const frameEmissiveIntensity = isHighlighted ? 0.18 : 0;
 
@@ -261,22 +278,21 @@ function ArtifactFrame({
         <meshStandardMaterial color="#1a1820" emissive="#0a0806" emissiveIntensity={0.2} roughness={0.58} />
       </mesh>
       <mesh
-        position={[0, 0.12, 0.14]}
+        position={[0, 0.12, 0.18]}
         onClick={(event: ThreeEvent<MouseEvent>) => {
           event.stopPropagation();
           onSelect(memory);
         }}
       >
-        <planeGeometry args={[1.62, 1.1]} />
-        <meshStandardMaterial
-          color={texture ? "#ffffff" : "#11131a"}
-          map={texture ?? undefined}
-          roughness={0.42}
-          side={THREE.DoubleSide}
-        />
+        <planeGeometry args={[texture ? imageWidth : 1.62, texture ? imageHeight : 1.1]} />
+        {texture ? (
+          <meshBasicMaterial key={imageUrl ?? memory.id} map={texture} toneMapped={false} side={THREE.DoubleSide} />
+        ) : (
+          <meshBasicMaterial color="#11131a" side={THREE.DoubleSide} />
+        )}
       </mesh>
       {showFallback && (
-        <group position={[0, 0.12, 0.165]}>
+        <group position={[0, 0.12, 0.205]}>
           <mesh position={[0, 0, -0.01]}>
             <planeGeometry args={[1.5, 0.98]} />
             <meshStandardMaterial color="#151820" emissive="#050609" emissiveIntensity={0.3} side={THREE.DoubleSide} />
