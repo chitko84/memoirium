@@ -152,41 +152,76 @@ function CameraTourFocus({
   return null;
 }
 
-function useImageTexture(imageUrl: string | null) {
+type TextureStatus = "idle" | "loading" | "loaded" | "missing" | "error";
+
+function getValidImageUrl(imageUrl: string | null) {
+  if (!imageUrl) {
+    return null;
+  }
+
+  try {
+    const parsedUrl = new URL(imageUrl);
+    return parsedUrl.protocol === "http:" || parsedUrl.protocol === "https:" ? parsedUrl.toString() : null;
+  } catch {
+    return null;
+  }
+}
+
+function useImageTexture(memoryTitle: string, imageUrl: string | null) {
   const [texture, setTexture] = useState<THREE.Texture | null>(null);
+  const [status, setStatus] = useState<TextureStatus>("idle");
 
   useEffect(() => {
     if (!imageUrl) {
+      setStatus("missing");
       setTexture(null);
       return;
     }
 
     let cancelled = false;
-    const image = new Image();
-    image.crossOrigin = "anonymous";
-    image.onload = () => {
-      if (cancelled) return;
+    const loader = new THREE.TextureLoader();
+    loader.setCrossOrigin("anonymous");
+    setStatus("loading");
 
-      const loadedTexture = new THREE.Texture(image);
-      loadedTexture.colorSpace = THREE.SRGBColorSpace;
-      loadedTexture.needsUpdate = true;
-      setTexture(loadedTexture);
-    };
-    image.onerror = () => {
-      if (!cancelled) setTexture(null);
-    };
-    image.src = imageUrl;
+    const loadedTexture = loader.load(
+      imageUrl,
+      (loaded) => {
+        if (cancelled) {
+          loaded.dispose();
+          return;
+        }
+
+        loaded.colorSpace = THREE.SRGBColorSpace;
+        loaded.anisotropy = 8;
+        loaded.minFilter = THREE.LinearMipmapLinearFilter;
+        loaded.magFilter = THREE.LinearFilter;
+        loaded.needsUpdate = true;
+        setTexture(loaded);
+        setStatus("loaded");
+      },
+      undefined,
+      (loadError) => {
+        if (cancelled) return;
+
+        console.error("Museum3D texture load failed", memoryTitle, imageUrl, loadError);
+        setTexture(null);
+        setStatus("error");
+      },
+    );
 
     return () => {
       cancelled = true;
+      loadedTexture.dispose();
       setTexture((current) => {
-        current?.dispose();
+        if (current !== loadedTexture) {
+          current?.dispose();
+        }
         return null;
       });
     };
-  }, [imageUrl]);
+  }, [imageUrl, memoryTitle]);
 
-  return texture;
+  return { texture, status };
 }
 
 function MuseumFrame({
@@ -198,8 +233,18 @@ function MuseumFrame({
   index: number;
   onSelect: (memory: Memory) => void;
 }) {
-  const texture = useImageTexture(memory.image_url);
+  const imageUrl = getValidImageUrl(memory.image_url);
+  const { texture, status } = useImageTexture(memory.title, imageUrl);
   const placement = getFramePlacement(index);
+  const showFallback = !texture && status !== "loading";
+
+  useEffect(() => {
+    console.log("Museum3D image", memory.title, memory.image_url);
+
+    if (memory.image_url && !imageUrl) {
+      console.warn("Museum3D invalid image_url", memory.title, memory.image_url);
+    }
+  }, [imageUrl, memory.image_url, memory.title]);
 
   return (
     <group position={placement.position} rotation={placement.rotation}>
@@ -211,23 +256,23 @@ function MuseumFrame({
         <boxGeometry args={[1.82, 1.3, 0.08]} />
         <meshStandardMaterial color="#f4e4bc" metalness={0.44} roughness={0.24} />
       </mesh>
-      <mesh position={[0, 0.08, 0.02]} onClick={(event: ThreeEvent<MouseEvent>) => {
+      <mesh position={[0, 0.08, 0.021]} onClick={(event: ThreeEvent<MouseEvent>) => {
         event.stopPropagation();
         onSelect(memory);
       }} castShadow>
-        <boxGeometry args={[1.62, 1.1, 0.05]} />
+        <planeGeometry args={[1.62, 1.1]} />
         <meshStandardMaterial color={texture ? "#ffffff" : "#101217"} map={texture ?? undefined} roughness={0.42} />
       </mesh>
-      {!texture && (
+      {showFallback && (
         <Text
           position={[0, 0.08, 0.06]}
-          fontSize={0.16}
+          fontSize={0.13}
           color="#d4af37"
           anchorX="center"
           anchorY="middle"
           maxWidth={1.2}
         >
-          {memory.title}
+          No Image Available
         </Text>
       )}
       <mesh position={[0, -0.72, 0.025]} castShadow>
