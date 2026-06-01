@@ -7,6 +7,7 @@ import { useAuth } from "../../auth/AuthContext";
 export function AdminUsers() {
   const { user: currentUser } = useAuth();
   const [users, setUsers] = useState<AdminUserRow[]>([]);
+  const [failedAvatars, setFailedAvatars] = useState<Record<string, boolean>>({});
   const [query, setQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
   const [selectedUser, setSelectedUser] = useState<AdminUserRow | null>(null);
@@ -64,6 +65,14 @@ export function AdminUsers() {
     });
   }, [query, roleFilter, users]);
 
+  const getInitials = (name: string) =>
+    name
+      .trim()
+      .split(/\s+/)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase())
+      .join("") || "U";
+
   return (
     <AdminPageShell title="Users" description="Review curator accounts, museum visibility, collection counts, and account roles.">
       <div className="mb-5 grid gap-3 md:grid-cols-[1fr_220px]">
@@ -110,7 +119,23 @@ export function AdminUsers() {
           <tbody>
             {filteredUsers.map((user) => (
               <tr key={user.id}>
-                <AdminTd>{user.display_name}</AdminTd>
+                <AdminTd>
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full border border-[var(--gold-primary)]/35 bg-[var(--gold-primary)]/10 text-[13px] font-semibold text-[var(--gold-primary)]">
+                      {user.avatar_url && !failedAvatars[user.id] ? (
+                        <img
+                          src={user.avatar_url}
+                          alt={user.display_name}
+                          className="h-full w-full object-cover"
+                          onError={() => setFailedAvatars((current) => ({ ...current, [user.id]: true }))}
+                        />
+                      ) : (
+                        <span className="flex h-full w-full items-center justify-center">{getInitials(user.display_name)}</span>
+                      )}
+                    </div>
+                    <span className="font-medium text-[var(--text-primary)]">{user.display_name}</span>
+                  </div>
+                </AdminTd>
                 <AdminTd>@{user.username}</AdminTd>
                 <AdminTd>{user.email ?? "Not exposed"}</AdminTd>
                 <AdminTd>{user.is_public ? "Public" : "Private"}</AdminTd>

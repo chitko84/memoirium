@@ -34,6 +34,7 @@ export type AdminUserRow = {
   id: string;
   display_name: string;
   username: string;
+  avatar_url: string | null;
   email: string | null;
   is_public: boolean;
   role: "user" | "admin";
@@ -46,6 +47,7 @@ type AdminUserEmailRpcRow = {
   id: string;
   display_name: string;
   username: string;
+  avatar_url: string | null;
   email: string | null;
   is_public: boolean;
   role: "user" | "admin";
@@ -138,6 +140,7 @@ export async function getAdminUsers(): Promise<AdminUserRow[]> {
       id: user.id,
       display_name: user.display_name,
       username: user.username,
+      avatar_url: user.avatar_url ?? null,
       email: user.email,
       is_public: user.is_public,
       role: user.role ?? "user",
@@ -168,6 +171,7 @@ export async function getAdminUsers(): Promise<AdminUserRow[]> {
       id: profile.id,
       display_name: profile.display_name,
       username: profile.username,
+      avatar_url: profile.avatar_url,
       email: null,
       is_public: profile.is_public,
       role: profile.role ?? "user",
