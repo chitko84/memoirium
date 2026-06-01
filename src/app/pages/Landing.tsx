@@ -65,13 +65,21 @@ export function Landing() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1 }}
           >
-            <h1 className="mb-4 max-w-full whitespace-nowrap text-center text-[3rem] leading-none tracking-[0.04em] text-[var(--gold-primary)] sm:text-[4rem] md:mb-6 md:text-8xl md:tracking-wide lg:text-9xl">
+            <motion.img
+              src="/memoirium-logo.png"
+              alt="Memoirium logo"
+              initial={{ opacity: 0, y: 14, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.9, delay: 0.15 }}
+              className="mx-auto mb-4 h-14 w-14 rounded-full border border-[var(--gold-primary)]/45 object-cover shadow-[0_0_32px_rgba(212,175,55,0.24)] transition-shadow duration-500 hover:shadow-[0_0_54px_rgba(212,175,55,0.42)] sm:h-16 sm:w-16 md:h-16 md:w-16 lg:h-20 lg:w-20 xl:h-24 xl:w-24"
+            />
+            <h1 className="mb-4 max-w-full whitespace-nowrap text-center text-[2.75rem] leading-none tracking-[0.04em] text-[var(--gold-primary)] sm:text-[3.75rem] md:text-7xl md:tracking-wide lg:text-8xl xl:text-9xl">
               MEMOIRIUM
             </h1>
-            <p className="mx-auto mb-3 max-w-xs text-lg text-[var(--gold-secondary)] italic sm:max-w-md sm:text-xl md:mb-4 md:max-w-none md:text-3xl">
+            <p className="mx-auto mb-5 max-w-xs text-lg text-[var(--gold-secondary)] italic sm:max-w-md sm:text-xl md:max-w-none md:text-3xl">
               Every memory deserves a gallery.
             </p>
-            <p className="mx-auto mb-8 max-w-[34rem] px-1 text-sm leading-6 text-[var(--text-secondary)] sm:px-0 sm:text-base sm:leading-7 md:mb-12 md:max-w-2xl md:text-lg md:leading-relaxed">
+            <p className="mx-auto mb-8 max-w-[34rem] px-1 text-sm leading-6 text-[var(--text-secondary)] sm:px-0 sm:text-base sm:leading-7 md:max-w-2xl md:text-lg md:leading-relaxed">
               Transform your personal memories into curated museum exhibitions. Create collections, upload memories, write stories, and explore them through elegant gallery-inspired interfaces.
             </p>
 
