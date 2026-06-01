@@ -42,6 +42,18 @@ export type AdminUserRow = {
   totalMemories: number;
 };
 
+type AdminUserEmailRpcRow = {
+  id: string;
+  display_name: string;
+  username: string;
+  email: string | null;
+  is_public: boolean;
+  role: "user" | "admin";
+  created_at: string;
+  total_collections: number;
+  total_memories: number;
+};
+
 export type AdminMuseumRow = {
   id: string;
   username: string;
@@ -118,6 +130,25 @@ export async function getAdminOverviewStats(): Promise<AdminOverviewStats> {
 }
 
 export async function getAdminUsers(): Promise<AdminUserRow[]> {
+  const client = requireSupabase();
+  const { data: rpcUsers, error: rpcError } = await client.rpc("get_admin_users_with_email");
+
+  if (!rpcError && rpcUsers) {
+    return (rpcUsers as AdminUserEmailRpcRow[]).map((user) => ({
+      id: user.id,
+      display_name: user.display_name,
+      username: user.username,
+      email: user.email,
+      is_public: user.is_public,
+      role: user.role ?? "user",
+      created_at: user.created_at,
+      totalCollections: user.total_collections ?? 0,
+      totalMemories: user.total_memories ?? 0,
+    }));
+  }
+
+  console.warn("Admin email RPC unavailable; falling back to profile-only users.", rpcError);
+
   const [profiles, collections, memories] = await Promise.all([
     selectAll<Profile>("profiles"),
     selectAll<{ user_id: string }>("collections"),

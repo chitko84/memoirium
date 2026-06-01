@@ -57,7 +57,8 @@ export function AdminUsers() {
       const matchesQuery =
         !normalizedQuery ||
         user.display_name.toLowerCase().includes(normalizedQuery) ||
-        user.username.toLowerCase().includes(normalizedQuery);
+        user.username.toLowerCase().includes(normalizedQuery) ||
+        (user.email?.toLowerCase().includes(normalizedQuery) ?? false);
       const matchesRole = roleFilter === "all" || user.role === roleFilter;
       return matchesQuery && matchesRole;
     });

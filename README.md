@@ -45,6 +45,7 @@ Only use the Supabase anon key in the client. Never expose the service role key 
 7. Confirm Storage policies allow public reads and authenticated writes only under `auth.uid()/filename`.
 8. Run `supabase/phase5-engagement.sql` to enable guestbook, likes, and comments.
 9. Run `supabase/admin-panel.sql` to enable admin roles and admin RLS policies.
+10. Run `supabase/admin-user-emails.sql` to let admins view user emails through a safe RPC.
 
 The schema includes profile auto-creation from Supabase Auth metadata:
 
@@ -61,6 +62,7 @@ Memoirium includes an admin-only platform dashboard at `/admin` with:
 - Simple engagement analytics.
 
 Admins are controlled by the `profiles.role` column. No user is promoted automatically.
+User emails are not queried from `auth.users` directly in the browser. The Users page calls the admin-verified `get_admin_users_with_email()` RPC, which returns only safe profile fields plus email.
 
 Manual promotion example:
 

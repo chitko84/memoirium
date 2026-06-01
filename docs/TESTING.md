@@ -135,9 +135,11 @@ Use this checklist after running `supabase/schema.sql` and configuring `.env`.
 - Run `supabase/admin-panel.sql` after the base schema and engagement migration.
 - Confirm a normal logged-in user visiting `/admin` sees the premium “Access Restricted” state.
 - Promote a test profile manually with `update public.profiles set role = 'admin' where id = '<profile-id>';`.
+- Run `supabase/admin-user-emails.sql` and confirm `/admin/users` shows emails through the admin-only `get_admin_users_with_email()` RPC.
 - Log in as that admin and confirm `/admin`, `/admin/users`, `/admin/museums`, `/admin/moderation`, and `/admin/analytics` load.
 - Confirm the regular sidebar shows “Admin Wing” only for the admin user.
-- On `/admin/users`, test search, role filter, public/private museum status, collection counts, memory counts, created date, and role badge.
+- On `/admin/users`, test search by display name, username, and email.
+- On `/admin/users`, test role filter, public/private museum status, collection counts, memory counts, created date, and role badge.
 - On `/admin/museums`, test search and confirm public museum links open `/museum/:username`.
 - On `/admin/moderation`, delete a guestbook entry after confirmation and confirm it disappears.
 - On `/admin/moderation`, delete a memory comment after confirmation and confirm it disappears.
