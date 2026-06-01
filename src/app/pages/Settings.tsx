@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Award, Copy, ExternalLink, Eye, EyeOff, Save, Settings as SettingsIcon, User } from "lucide-react";
+import { Award, Camera, Copy, ExternalLink, Eye, EyeOff, Save, Settings as SettingsIcon, User } from "lucide-react";
 import { Sidebar } from "../components/Sidebar";
 import { Navbar } from "../components/Navbar";
 import { Button } from "../components/Button";
 import { MuseumShareCard } from "../components/MuseumShareCard";
 import { useAuth } from "../auth/AuthContext";
-import { getCurrentProfile, updateProfile } from "../services/profiles";
+import { getCurrentProfile, updateProfile, uploadAvatar } from "../services/profiles";
 import { getUserCollections } from "../services/collections";
 import { getUserMemories } from "../services/memories";
 import { getMuseumAchievements } from "../services/achievements";
@@ -50,6 +50,15 @@ function getFriendlyProfileError(message: string) {
   return "Unable to save your museum profile. Please review the fields and try again.";
 }
 
+function getInitials(value: string) {
+  return value
+    .split(" ")
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+}
+
 export function Settings() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -58,6 +67,7 @@ export function Settings() {
   const [form, setForm] = useState<SettingsForm>(emptyForm);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const { user } = useAuth();
@@ -187,6 +197,53 @@ export function Settings() {
     }
   };
 
+  const handleAvatarUpload = async (file: File | undefined) => {
+    if (!user || !file) return;
+
+    setError("");
+    setSuccess("");
+
+    if (!file.type.startsWith("image/")) {
+      setError("Choose an image file for your profile picture.");
+      return;
+    }
+
+    if (file.size > 3 * 1024 * 1024) {
+      setError("Profile pictures must be 3MB or smaller.");
+      return;
+    }
+
+    const validationError = validate();
+    if (validationError) {
+      setError(`${validationError} Save your profile details before uploading a photo.`);
+      return;
+    }
+
+    setIsUploadingAvatar(true);
+
+    try {
+      const publicUrl = await uploadAvatar(user.id, file);
+      const savedProfile = await updateProfile(user.id, {
+        display_name: form.display_name.trim(),
+        username: normalizeUsername(form.username),
+        bio: form.bio.trim() || null,
+        avatar_url: publicUrl,
+        museum_title: form.museum_title.trim() || null,
+        museum_tagline: form.museum_tagline.trim() || null,
+        is_public: form.is_public,
+      });
+
+      setProfile(savedProfile);
+      setForm((current) => ({ ...current, avatar_url: savedProfile.avatar_url ?? publicUrl }));
+      window.dispatchEvent(new CustomEvent("memoirium-profile-updated", { detail: savedProfile }));
+      setSuccess("Profile picture updated.");
+    } catch (uploadError) {
+      setError(uploadError instanceof Error ? uploadError.message : "Unable to upload your profile picture.");
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  };
+
   const copyMuseumLink = async () => {
     await navigator.clipboard.writeText(publicMuseumUrl);
     setSuccess("Public museum link copied.");
@@ -263,14 +320,35 @@ export function Settings() {
                       />
                     </div>
 
-                    <div>
-                      <label className="block text-sm mb-2 text-[var(--text-primary)]">Avatar URL</label>
-                      <input
-                        value={form.avatar_url}
-                        onChange={(event) => setForm((current) => ({ ...current, avatar_url: event.target.value }))}
-                        className="w-full px-4 py-3 bg-[var(--input-background)] border border-[var(--border)] rounded-lg text-[var(--text-primary)] focus:border-[var(--gold-primary)] focus:outline-none transition-colors"
-                        placeholder="https://..."
-                      />
+                    <div className="rounded-lg border border-[var(--border)] bg-[var(--input-background)] p-4">
+                      <label className="mb-3 block text-sm text-[var(--text-primary)]">Profile Picture</label>
+                      <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+                        <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[var(--gold-primary)]/35 bg-[var(--gold-primary)]/10">
+                          {form.avatar_url ? (
+                            <img src={form.avatar_url} alt={form.display_name || "Profile"} className="h-full w-full object-cover" />
+                          ) : (
+                            <span className="text-xl font-semibold text-[var(--gold-primary)]">
+                              {getInitials(form.display_name || "Memoirium Curator") || "MC"}
+                            </span>
+                          )}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="mb-3 text-sm leading-relaxed text-[var(--text-secondary)]">
+                            Upload a square image for the best curator portrait display. JPG, PNG, and WebP are supported up to 3MB.
+                          </p>
+                          <label className="inline-flex cursor-pointer items-center gap-2 border border-[var(--gold-primary)] px-4 py-2 text-sm text-[var(--gold-primary)] transition-colors hover:bg-[var(--gold-primary)] hover:text-[#0F1115]">
+                            <Camera size={16} />
+                            {isUploadingAvatar ? "Uploading..." : "Change Photo"}
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="sr-only"
+                              disabled={isUploadingAvatar}
+                              onChange={(event) => void handleAvatarUpload(event.target.files?.[0])}
+                            />
+                          </label>
+                        </div>
+                      </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

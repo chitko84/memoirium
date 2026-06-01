@@ -515,8 +515,12 @@ export function Museum() {
                   </p>
 
                   <div className="flex items-center gap-3 mb-9">
-                    <div className="w-12 h-12 rounded-full bg-[var(--gold-primary)] flex items-center justify-center text-[#0F1115] font-semibold">
-                      {getInitials(profile.display_name)}
+                    <div className="w-12 h-12 overflow-hidden rounded-full bg-[var(--gold-primary)] flex items-center justify-center text-[#0F1115] font-semibold">
+                      {profile.avatar_url ? (
+                        <img src={profile.avatar_url} alt={profile.display_name} className="h-full w-full object-cover" />
+                      ) : (
+                        getInitials(profile.display_name)
+                      )}
                     </div>
                     <div>
                       <p className="text-sm text-[var(--text-secondary)]">Curator</p>

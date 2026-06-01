@@ -3,6 +3,7 @@ import { LayoutDashboard, FolderOpen, Clock, Settings, X, LogOut, Cuboid, MapPin
 import { useNavigate, useLocation } from "react-router";
 import { useAuth } from "../auth/AuthContext";
 import { getCurrentProfile } from "../services/profiles";
+import type { Profile } from "../types/memoirium";
 
 interface SidebarProps {
   isOpen?: boolean;
@@ -24,7 +25,8 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
   const location = useLocation();
   const { user, signOut } = useAuth();
   const [isAdmin, setIsAdmin] = useState(false);
-  const displayName = user?.user_metadata.display_name || user?.email || "Memoirium Curator";
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const displayName = profile?.display_name || user?.user_metadata.display_name || user?.email || "Memoirium Curator";
   const initials = displayName
     .split(" ")
     .map((part: string) => part[0])
@@ -44,21 +46,38 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
     const loadProfile = async () => {
       if (!user) {
         setIsAdmin(false);
+        setProfile(null);
         return;
       }
 
       try {
-        const profile = await getCurrentProfile(user.id);
-        if (isMounted) setIsAdmin(profile?.role === "admin");
+        const nextProfile = await getCurrentProfile(user.id);
+        if (isMounted) {
+          setProfile(nextProfile);
+          setIsAdmin(nextProfile?.role === "admin");
+        }
       } catch {
-        if (isMounted) setIsAdmin(false);
+        if (isMounted) {
+          setProfile(null);
+          setIsAdmin(false);
+        }
       }
     };
 
+    const handleProfileUpdated = (event: Event) => {
+      const nextProfile = (event as CustomEvent<Profile>).detail;
+      if (nextProfile?.id === user?.id) {
+        setProfile(nextProfile);
+        setIsAdmin(nextProfile.role === "admin");
+      }
+    };
+
+    window.addEventListener("memoirium-profile-updated", handleProfileUpdated);
     void loadProfile();
 
     return () => {
       isMounted = false;
+      window.removeEventListener("memoirium-profile-updated", handleProfileUpdated);
     };
   }, [user]);
 
@@ -139,8 +158,12 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
 
         <div className="p-4 border-t border-[var(--border)]">
           <div className="flex items-center gap-3 px-4 py-3">
-            <div className="w-10 h-10 rounded-full bg-[var(--gold-primary)] flex items-center justify-center text-[#0F1115] font-semibold">
-              {initials || "MC"}
+            <div className="w-10 h-10 overflow-hidden rounded-full bg-[var(--gold-primary)] flex items-center justify-center text-[#0F1115] font-semibold">
+              {profile?.avatar_url ? (
+                <img src={profile.avatar_url} alt={displayName} className="h-full w-full object-cover" />
+              ) : (
+                initials || "MC"
+              )}
             </div>
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-medium text-[var(--text-primary)]">{displayName}</p>

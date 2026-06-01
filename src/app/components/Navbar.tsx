@@ -1,6 +1,9 @@
+import { useEffect, useState } from "react";
 import { LogOut, Menu, Search, User } from "lucide-react";
 import { useNavigate } from "react-router";
 import { useAuth } from "../auth/AuthContext";
+import { getCurrentProfile } from "../services/profiles";
+import type { Profile } from "../types/memoirium";
 
 interface NavbarProps {
   onMenuClick?: () => void;
@@ -9,12 +12,44 @@ interface NavbarProps {
 
 export function Navbar({ onMenuClick, showSearch = false }: NavbarProps) {
   const navigate = useNavigate();
-  const { signOut } = useAuth();
+  const { user, signOut } = useAuth();
+  const [profile, setProfile] = useState<Profile | null>(null);
 
   const handleSignOut = async () => {
     await signOut();
     navigate("/login", { replace: true });
   };
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadProfile = async () => {
+      if (!user) {
+        setProfile(null);
+        return;
+      }
+
+      try {
+        const nextProfile = await getCurrentProfile(user.id);
+        if (isMounted) setProfile(nextProfile);
+      } catch {
+        if (isMounted) setProfile(null);
+      }
+    };
+
+    const handleProfileUpdated = (event: Event) => {
+      const nextProfile = (event as CustomEvent<Profile>).detail;
+      if (nextProfile?.id === user?.id) setProfile(nextProfile);
+    };
+
+    window.addEventListener("memoirium-profile-updated", handleProfileUpdated);
+    void loadProfile();
+
+    return () => {
+      isMounted = false;
+      window.removeEventListener("memoirium-profile-updated", handleProfileUpdated);
+    };
+  }, [user]);
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-[var(--background)]/80 backdrop-blur-xl border-b border-[var(--border)]">
@@ -47,8 +82,12 @@ export function Navbar({ onMenuClick, showSearch = false }: NavbarProps) {
         )}
 
         <div className="flex items-center gap-3">
-          <button className="w-10 h-10 rounded-full bg-[var(--gold-primary)] flex items-center justify-center">
-            <User size={20} className="text-[#0F1115]" />
+          <button className="w-10 h-10 overflow-hidden rounded-full bg-[var(--gold-primary)] flex items-center justify-center">
+            {profile?.avatar_url ? (
+              <img src={profile.avatar_url} alt={profile.display_name} className="h-full w-full object-cover" />
+            ) : (
+              <User size={20} className="text-[#0F1115]" />
+            )}
           </button>
           <button
             onClick={handleSignOut}
