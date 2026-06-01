@@ -5,6 +5,7 @@ import { AppLoading } from "./components/AppLoading";
 
 const Landing = lazy(() => import("./pages/Landing").then((module) => ({ default: module.Landing })));
 const Discover = lazy(() => import("./pages/Discover").then((module) => ({ default: module.Discover })));
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy").then((module) => ({ default: module.PrivacyPolicy })));
 const Login = lazy(() => import("./pages/Login").then((module) => ({ default: module.Login })));
 const Register = lazy(() => import("./pages/Register").then((module) => ({ default: module.Register })));
 const Dashboard = lazy(() => import("./pages/Dashboard").then((module) => ({ default: module.Dashboard })));
@@ -28,6 +29,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/discover" element={<Discover />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route element={<PublicOnlyRoute />}>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />

@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Button } from "../components/Button";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { Landmark, BookOpen, Users, Heart, Camera, Archive, Share2 } from "lucide-react";
 
 export function Landing() {
@@ -188,11 +188,11 @@ export function Landing() {
               <p className="text-sm text-[var(--text-secondary)]">Every memory deserves a gallery.</p>
             </div>
 
-            <div className="flex gap-8 text-sm">
-              <a href="#" className="text-[var(--text-secondary)] hover:text-[var(--gold-primary)] transition-colors">About</a>
-              <a href="#" className="text-[var(--text-secondary)] hover:text-[var(--gold-primary)] transition-colors">Contact</a>
-              <a href="#" className="text-[var(--text-secondary)] hover:text-[var(--gold-primary)] transition-colors">GitHub</a>
-              <a href="#" className="text-[var(--text-secondary)] hover:text-[var(--gold-primary)] transition-colors">Privacy Policy</a>
+            <div className="flex flex-wrap justify-center gap-6 text-sm sm:gap-8">
+              <a href="https://my.linkedin.com/in/chit-ko-ko-0b30a3299" target="_blank" rel="noopener noreferrer" className="text-[var(--text-secondary)] hover:text-[var(--gold-primary)] transition-colors">About</a>
+              <a href="https://my.linkedin.com/in/chit-ko-ko-0b30a3299" target="_blank" rel="noopener noreferrer" className="text-[var(--text-secondary)] hover:text-[var(--gold-primary)] transition-colors">Contact</a>
+              <a href="https://github.com/chitko84" target="_blank" rel="noopener noreferrer" className="text-[var(--text-secondary)] hover:text-[var(--gold-primary)] transition-colors">GitHub</a>
+              <Link to="/privacy" className="text-[var(--text-secondary)] hover:text-[var(--gold-primary)] transition-colors">Privacy Policy</Link>
             </div>
           </div>
 
