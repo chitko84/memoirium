@@ -50,7 +50,14 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
         ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         <div className="p-6 border-b border-[var(--border)] flex items-center justify-between">
-          <h2 className="text-xl tracking-wider text-[var(--gold-primary)]">MEMOIRIUM</h2>
+          <div className="flex items-center gap-3">
+            <img
+              src="/memoirium-logo.png"
+              alt="Memoirium logo"
+              className="h-10 w-10 rounded-full border border-[var(--gold-primary)]/35 object-cover"
+            />
+            <h2 className="text-xl tracking-wider text-[var(--gold-primary)]">MEMOIRIUM</h2>
+          </div>
           {onClose && (
             <button onClick={onClose} className="lg:hidden text-[var(--text-primary)]">
               <X size={24} />

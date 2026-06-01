@@ -184,7 +184,14 @@ export function Landing() {
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div>
-              <h3 className="text-2xl text-[var(--gold-primary)] tracking-wider mb-2">MEMOIRIUM</h3>
+              <div className="mb-2 flex items-center justify-center gap-3 md:justify-start">
+                <img
+                  src="/memoirium-logo.png"
+                  alt="Memoirium logo"
+                  className="h-10 w-10 rounded-full border border-[var(--gold-primary)]/35 object-cover"
+                />
+                <h3 className="text-2xl text-[var(--gold-primary)] tracking-wider">MEMOIRIUM</h3>
+              </div>
               <p className="text-sm text-[var(--text-secondary)]">Every memory deserves a gallery.</p>
             </div>
 

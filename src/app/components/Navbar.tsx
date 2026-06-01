@@ -25,7 +25,14 @@ export function Navbar({ onMenuClick, showSearch = false }: NavbarProps) {
               <Menu size={24} />
             </button>
           )}
-          <h1 className="text-2xl tracking-wider text-[var(--gold-primary)]">MEMOIRIUM</h1>
+          <div className="flex items-center gap-3">
+            <img
+              src="/memoirium-logo.png"
+              alt="Memoirium logo"
+              className="h-9 w-9 rounded-full border border-[var(--gold-primary)]/35 object-cover"
+            />
+            <h1 className="text-2xl tracking-wider text-[var(--gold-primary)]">MEMOIRIUM</h1>
+          </div>
         </div>
 
         {showSearch && (
