@@ -51,7 +51,7 @@ export function Landing() {
   return (
     <div className="min-h-screen bg-[var(--background)]">
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      <section className="relative flex min-h-[100svh] items-center justify-center overflow-hidden py-14 sm:py-20 md:min-h-screen md:py-0">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[var(--background)] to-[var(--background)]" />
 
         <div className="absolute inset-0 opacity-5">
@@ -59,29 +59,29 @@ export function Landing() {
           <div className="absolute bottom-20 right-10 w-96 h-96 bg-[var(--gold-primary)] rounded-full blur-3xl" />
         </div>
 
-        <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
+        <div className="relative z-10 mx-auto w-full max-w-5xl px-5 text-center sm:px-6">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1 }}
           >
-            <h1 className="text-7xl md:text-8xl lg:text-9xl mb-6 text-[var(--gold-primary)] tracking-wide">
+            <h1 className="mb-4 max-w-full whitespace-nowrap text-center text-[3rem] leading-none tracking-[0.04em] text-[var(--gold-primary)] sm:text-[4rem] md:mb-6 md:text-8xl md:tracking-wide lg:text-9xl">
               MEMOIRIUM
             </h1>
-            <p className="text-2xl md:text-3xl text-[var(--gold-secondary)] mb-4 italic">
+            <p className="mx-auto mb-3 max-w-xs text-lg text-[var(--gold-secondary)] italic sm:max-w-md sm:text-xl md:mb-4 md:max-w-none md:text-3xl">
               Every memory deserves a gallery.
             </p>
-            <p className="text-lg text-[var(--text-secondary)] mb-12 max-w-2xl mx-auto leading-relaxed">
+            <p className="mx-auto mb-8 max-w-[34rem] px-1 text-sm leading-6 text-[var(--text-secondary)] sm:px-0 sm:text-base sm:leading-7 md:mb-12 md:max-w-2xl md:text-lg md:leading-relaxed">
               Transform your personal memories into curated museum exhibitions. Create collections, upload memories, write stories, and explore them through elegant gallery-inspired interfaces.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button variant="primary" size="lg" onClick={() => navigate("/login")}>
-                <Landmark size={20} />
+            <div className="mx-auto flex w-full max-w-sm flex-col items-center justify-center gap-3 sm:max-w-none sm:flex-row sm:gap-4">
+              <Button variant="primary" size="lg" className="min-h-11 w-full px-6 py-3 text-base sm:w-auto md:min-h-0 md:px-8 md:py-4 md:text-lg" onClick={() => navigate("/login")}>
+                <Landmark size={18} className="md:h-5 md:w-5" />
                 Enter Museum
               </Button>
-              <Button variant="secondary" size="lg" onClick={() => navigate("/discover")}>
-                <Share2 size={20} />
+              <Button variant="secondary" size="lg" className="min-h-11 w-full px-6 py-3 text-base sm:w-auto md:min-h-0 md:px-8 md:py-4 md:text-lg" onClick={() => navigate("/discover")}>
+                <Share2 size={18} className="md:h-5 md:w-5" />
                 Explore Public Museums
               </Button>
             </div>
