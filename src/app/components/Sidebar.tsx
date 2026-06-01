@@ -1,6 +1,8 @@
-import { LayoutDashboard, FolderOpen, Clock, Settings, X, LogOut, Cuboid, MapPin } from "lucide-react";
+import { useEffect, useState } from "react";
+import { LayoutDashboard, FolderOpen, Clock, Settings, X, LogOut, Cuboid, MapPin, ShieldCheck } from "lucide-react";
 import { useNavigate, useLocation } from "react-router";
 import { useAuth } from "../auth/AuthContext";
+import { getCurrentProfile } from "../services/profiles";
 
 interface SidebarProps {
   isOpen?: boolean;
@@ -21,6 +23,7 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, signOut } = useAuth();
+  const [isAdmin, setIsAdmin] = useState(false);
   const displayName = user?.user_metadata.display_name || user?.email || "Memoirium Curator";
   const initials = displayName
     .split(" ")
@@ -34,6 +37,30 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
     onClose?.();
     navigate("/login", { replace: true });
   };
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadProfile = async () => {
+      if (!user) {
+        setIsAdmin(false);
+        return;
+      }
+
+      try {
+        const profile = await getCurrentProfile(user.id);
+        if (isMounted) setIsAdmin(profile?.role === "admin");
+      } catch {
+        if (isMounted) setIsAdmin(false);
+      }
+    };
+
+    void loadProfile();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [user]);
 
   return (
     <>
@@ -90,6 +117,24 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
               </button>
             );
           })}
+          {isAdmin && (
+            <button
+              onClick={() => {
+                navigate("/admin");
+                onClose?.();
+              }}
+              className={`
+                w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300
+                ${location.pathname.startsWith("/admin")
+                  ? 'bg-[var(--gold-primary)] text-[#0F1115]'
+                  : 'text-[var(--text-primary)] hover:bg-[var(--surface-light)] hover:text-[var(--gold-primary)]'
+                }
+              `}
+            >
+              <ShieldCheck size={20} />
+              <span className="font-medium">Admin Wing</span>
+            </button>
+          )}
         </nav>
 
         <div className="p-4 border-t border-[var(--border)]">

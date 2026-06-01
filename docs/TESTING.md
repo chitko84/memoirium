@@ -130,6 +130,20 @@ Use this checklist after running `supabase/schema.sql` and configuring `.env`.
 - Confirm guestbook, likes, and comments are unavailable for private profiles or private memories.
 - Log in as the museum owner and confirm RLS allows deleting own guestbook entries and comments through service calls.
 
+## Admin Panel
+
+- Run `supabase/admin-panel.sql` after the base schema and engagement migration.
+- Confirm a normal logged-in user visiting `/admin` sees the premium “Access Restricted” state.
+- Promote a test profile manually with `update public.profiles set role = 'admin' where id = '<profile-id>';`.
+- Log in as that admin and confirm `/admin`, `/admin/users`, `/admin/museums`, `/admin/moderation`, and `/admin/analytics` load.
+- Confirm the regular sidebar shows “Admin Wing” only for the admin user.
+- On `/admin/users`, test search, role filter, public/private museum status, collection counts, memory counts, created date, and role badge.
+- On `/admin/museums`, test search and confirm public museum links open `/museum/:username`.
+- On `/admin/moderation`, delete a guestbook entry after confirmation and confirm it disappears.
+- On `/admin/moderation`, delete a memory comment after confirmation and confirm it disappears.
+- On `/admin/analytics`, confirm rankings and recent activity cards reflect existing visits, likes, comments, and guestbook records.
+- Confirm a normal user cannot query all profiles, collections, memories, visits, guestbook entries, comments, or likes through the admin UI.
+
 ## Privacy Checks
 
 - Account A should not see Account B private dashboard data.

@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route } from "react-router";
 import { ProtectedRoute, PublicOnlyRoute } from "./auth/ProtectedRoute";
+import { AdminRoute } from "./auth/AdminRoute";
 import { AppLoading } from "./components/AppLoading";
 
 const Landing = lazy(() => import("./pages/Landing").then((module) => ({ default: module.Landing })));
@@ -20,6 +21,15 @@ const Gallery = lazy(() => import("./pages/Gallery").then((module) => ({ default
 const MemoryMap = lazy(() => import("./pages/MemoryMap").then((module) => ({ default: module.MemoryMap })));
 const Museum3D = lazy(() => import("./pages/Museum3D").then((module) => ({ default: module.Museum3D })));
 const Settings = lazy(() => import("./pages/Settings").then((module) => ({ default: module.Settings })));
+const AdminOverview = lazy(() => import("./pages/admin/AdminOverview").then((module) => ({ default: module.AdminOverview })));
+const AdminUsers = lazy(() => import("./pages/admin/AdminUsers").then((module) => ({ default: module.AdminUsers })));
+const AdminMuseums = lazy(() => import("./pages/admin/AdminMuseums").then((module) => ({ default: module.AdminMuseums })));
+const AdminModeration = lazy(() =>
+  import("./pages/admin/AdminModeration").then((module) => ({ default: module.AdminModeration })),
+);
+const AdminAnalytics = lazy(() =>
+  import("./pages/admin/AdminAnalytics").then((module) => ({ default: module.AdminAnalytics })),
+);
 const NotFound = lazy(() => import("./pages/NotFound").then((module) => ({ default: module.NotFound })));
 
 export default function App() {
@@ -44,6 +54,13 @@ export default function App() {
             <Route path="/map" element={<MemoryMap />} />
             <Route path="/museum-3d" element={<Museum3D />} />
             <Route path="/settings" element={<Settings />} />
+          </Route>
+          <Route element={<AdminRoute />}>
+            <Route path="/admin" element={<AdminOverview />} />
+            <Route path="/admin/users" element={<AdminUsers />} />
+            <Route path="/admin/museums" element={<AdminMuseums />} />
+            <Route path="/admin/moderation" element={<AdminModeration />} />
+            <Route path="/admin/analytics" element={<AdminAnalytics />} />
           </Route>
           <Route path="/museum/:username?" element={<Museum />} />
           <Route path="*" element={<NotFound />} />

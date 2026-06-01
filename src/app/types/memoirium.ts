@@ -20,6 +20,7 @@ export type Profile = {
   museum_title: string | null;
   museum_tagline: string | null;
   is_public: boolean;
+  role: "user" | "admin";
   created_at: string;
   updated_at: string;
 };

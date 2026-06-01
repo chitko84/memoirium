@@ -28,6 +28,7 @@ Memoirium turns personal memories into immersive digital museum exhibitions. It 
 - Memory Map for location-based museum exploration without paid map APIs.
 - Museum achievements computed from real curator activity.
 - Shareable Museum Card for public museum promotion.
+- Admin-only platform management at `/admin`.
 - Row Level Security to protect private rooms and memories.
 
 ## Signature 3D Gallery
@@ -95,6 +96,16 @@ Museum achievements are computed locally from the current profile, exhibition ro
 - 3D exhibition room navigation.
 - Premium 3D entry, atmosphere, and guided tour polish.
 
+## Admin Panel
+
+Memoirium includes a production admin wing for platform operations. It is protected by the `profiles.role = 'admin'` flag and Supabase RLS policies, so normal curator accounts cannot view platform-wide records.
+
+- Overview shows total users, public museums, exhibition rooms, artifacts, visits, guestbook entries, comments, and likes.
+- Users shows curator profile inventory without exposing secret auth data.
+- Museums shows public museum status, room counts, memory counts, visit counts, and public links.
+- Moderation lets admins review and delete recent guestbook entries and memory comments.
+- Analytics highlights most visited museums, most liked artifacts, most commented artifacts, and recent activity counts.
+
 ## Shareable Museum Card
 
 Settings and public museums include a noir/gold share card generated from real public profile data. It shows museum title, curator name, tagline, public exhibition room count, public artifact count, and the public museum URL. Visitors and curators can copy the museum link, copy share text, or use the browser Web Share API when supported.
@@ -103,7 +114,7 @@ Settings and public museums include a noir/gold share card generated from real p
 
 - Dedicated avatar bucket and upload UI.
 - Public room detail pages.
-- Visitor analytics dashboard.
+- Deeper visitor analytics dashboard.
 - Share cards for public memories.
 - Memory constellation mode.
 - Collaborative museums.

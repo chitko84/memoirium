@@ -43,11 +43,34 @@ Only use the Supabase anon key in the client. Never expose the service role key 
 5. Confirm RLS is enabled on all public tables.
 6. Confirm the `memory-images` Storage bucket exists.
 7. Confirm Storage policies allow public reads and authenticated writes only under `auth.uid()/filename`.
+8. Run `supabase/phase5-engagement.sql` to enable guestbook, likes, and comments.
+9. Run `supabase/admin-panel.sql` to enable admin roles and admin RLS policies.
 
 The schema includes profile auto-creation from Supabase Auth metadata:
 
 - `username`
 - `display_name`
+
+### Admin Panel
+
+Memoirium includes an admin-only platform dashboard at `/admin` with:
+
+- Platform overview stats.
+- User and public museum inventory.
+- Guestbook/comment moderation.
+- Simple engagement analytics.
+
+Admins are controlled by the `profiles.role` column. No user is promoted automatically.
+
+Manual promotion example:
+
+```sql
+update public.profiles
+set role = 'admin'
+where id = '00000000-0000-0000-0000-000000000000';
+```
+
+To promote by email, identify the user id from Supabase Auth in the Supabase dashboard, then update `public.profiles` by `id`. Do not expose the Supabase service role key in the Vite client.
 
 ## Run Locally
 
@@ -147,3 +170,4 @@ For SPA routing, Vercel should serve `index.html` for client routes. If needed, 
 - Public museum at `/museum/:username`
 - Immersive CSS-based Museum Gallery at `/gallery`
 - True 3D Museum at `/museum-3d`
+- Admin panel at `/admin` for admins only
