@@ -39,7 +39,7 @@ begin
     profile_row.id,
     profile_row.display_name,
     profile_row.username,
-    profile_row.avatar_url,
+    profile_row.avatar_url::text,
     auth_users.email::text,
     profile_row.is_public,
     profile_row.role,
