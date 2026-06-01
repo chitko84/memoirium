@@ -173,6 +173,7 @@ function useImageTexture(memoryTitle: string, imageUrl: string | null) {
 
   useEffect(() => {
     if (!imageUrl) {
+      console.warn("Museum3D memory has no image_url", memoryTitle);
       setStatus("missing");
       setTexture(null);
       return;
@@ -203,7 +204,7 @@ function useImageTexture(memoryTitle: string, imageUrl: string | null) {
       (loadError) => {
         if (cancelled) return;
 
-        console.error("Museum3D texture load failed", memoryTitle, imageUrl, loadError);
+        console.warn("Museum3D texture load failed", memoryTitle, imageUrl, loadError);
         setTexture(null);
         setStatus("error");
       },
@@ -224,62 +225,79 @@ function useImageTexture(memoryTitle: string, imageUrl: string | null) {
   return { texture, status };
 }
 
-function MuseumFrame({
+function ArtifactFrame({
   memory,
-  index,
+  position,
+  rotation,
   onSelect,
+  isHighlighted,
 }: {
   memory: Memory;
-  index: number;
+  position: [number, number, number];
+  rotation: [number, number, number];
   onSelect: (memory: Memory) => void;
+  isHighlighted: boolean;
 }) {
   const imageUrl = getValidImageUrl(memory.image_url);
   const { texture, status } = useImageTexture(memory.title, imageUrl);
-  const placement = getFramePlacement(index);
   const showFallback = !texture && status !== "loading";
-
-  useEffect(() => {
-    console.log("Museum3D image", memory.title, memory.image_url);
-
-    if (memory.image_url && !imageUrl) {
-      console.warn("Museum3D invalid image_url", memory.title, memory.image_url);
-    }
-  }, [imageUrl, memory.image_url, memory.title]);
+  const frameEmissive = isHighlighted ? "#d4af37" : "#000000";
+  const frameEmissiveIntensity = isHighlighted ? 0.18 : 0;
 
   return (
-    <group position={placement.position} rotation={placement.rotation}>
-      <mesh position={[0, 0.08, -0.06]} castShadow receiveShadow>
-        <boxGeometry args={[1.98, 1.46, 0.12]} />
-        <meshStandardMaterial color="#c99f2e" metalness={0.78} roughness={0.2} />
+    <group position={position} rotation={rotation}>
+      <mesh position={[0, 0.08, 0.02]} castShadow receiveShadow>
+        <boxGeometry args={[2.1, 1.56, 0.12]} />
+        <meshStandardMaterial
+          color="#d4af37"
+          emissive={frameEmissive}
+          emissiveIntensity={frameEmissiveIntensity}
+          metalness={0.78}
+          roughness={0.2}
+        />
       </mesh>
-      <mesh position={[0, 0.08, -0.015]} castShadow>
-        <boxGeometry args={[1.82, 1.3, 0.08]} />
-        <meshStandardMaterial color="#f4e4bc" metalness={0.44} roughness={0.24} />
+      <mesh position={[0, 0.08, 0.095]} castShadow receiveShadow>
+        <boxGeometry args={[1.82, 1.28, 0.06]} />
+        <meshStandardMaterial color="#1a1820" emissive="#0a0806" emissiveIntensity={0.2} roughness={0.58} />
       </mesh>
-      <mesh position={[0, 0.08, 0.021]} onClick={(event: ThreeEvent<MouseEvent>) => {
-        event.stopPropagation();
-        onSelect(memory);
-      }} castShadow>
+      <mesh
+        position={[0, 0.12, 0.14]}
+        onClick={(event: ThreeEvent<MouseEvent>) => {
+          event.stopPropagation();
+          onSelect(memory);
+        }}
+      >
         <planeGeometry args={[1.62, 1.1]} />
-        <meshStandardMaterial color={texture ? "#ffffff" : "#101217"} map={texture ?? undefined} roughness={0.42} />
+        <meshStandardMaterial
+          color={texture ? "#ffffff" : "#11131a"}
+          map={texture ?? undefined}
+          roughness={0.42}
+          side={THREE.DoubleSide}
+        />
       </mesh>
       {showFallback && (
-        <Text
-          position={[0, 0.08, 0.06]}
-          fontSize={0.13}
-          color="#d4af37"
-          anchorX="center"
-          anchorY="middle"
-          maxWidth={1.2}
-        >
-          No Image Available
-        </Text>
+        <group position={[0, 0.12, 0.165]}>
+          <mesh position={[0, 0, -0.01]}>
+            <planeGeometry args={[1.5, 0.98]} />
+            <meshStandardMaterial color="#151820" emissive="#050609" emissiveIntensity={0.3} side={THREE.DoubleSide} />
+          </mesh>
+          <lineSegments position={[0, 0, 0.005]}>
+            <edgesGeometry args={[new THREE.PlaneGeometry(1.5, 0.98)]} />
+            <lineBasicMaterial color="#d4af37" />
+          </lineSegments>
+          <Text position={[0, 0.16, 0.02]} fontSize={0.12} color="#d4af37" anchorX="center" anchorY="middle" maxWidth={1.2}>
+            Image unavailable
+          </Text>
+          <Text position={[0, -0.08, 0.02]} fontSize={0.085} color="#f4e4bc" anchorX="center" anchorY="middle" maxWidth={1.18}>
+            {memory.title}
+          </Text>
+        </group>
       )}
-      <mesh position={[0, -0.72, 0.025]} castShadow>
+      <mesh position={[0, -0.72, 0.13]} castShadow>
         <boxGeometry args={[1.44, 0.24, 0.035]} />
         <meshStandardMaterial color="#0b0c10" roughness={0.55} />
       </mesh>
-      <Text position={[0, -0.72, 0.055]} fontSize={0.09} color="#f4e4bc" anchorX="center" anchorY="middle" maxWidth={1.24}>
+      <Text position={[0, -0.72, 0.16]} fontSize={0.09} color="#f4e4bc" anchorX="center" anchorY="middle" maxWidth={1.24}>
         {memory.title}
       </Text>
     </group>
@@ -397,9 +415,20 @@ function MuseumRoom({
         </mesh>
       ))}
 
-      {displayedMemories.map((memory, index) => (
-        <MuseumFrame key={memory.id} memory={memory} index={index} onSelect={onSelectMemory} />
-      ))}
+      {displayedMemories.map((memory, index) => {
+        const placement = getFramePlacement(index);
+
+        return (
+          <ArtifactFrame
+            key={memory.id}
+            memory={memory}
+            position={placement.position}
+            rotation={placement.rotation}
+            isHighlighted={activeFrameIndex === index}
+            onSelect={onSelectMemory}
+          />
+        );
+      })}
 
       <OrbitControls
         ref={controlsRef}
