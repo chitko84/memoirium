@@ -223,6 +223,18 @@ export async function deleteMemoryCommentAsAdmin(id: string) {
   if (error) throw error;
 }
 
+export async function deleteMuseumAsAdmin(profileId: string) {
+  const client = requireSupabase();
+  const { error } = await client.rpc("admin_delete_museum", { p_profile_id: profileId });
+  if (error) throw error;
+}
+
+export async function deleteUserProfileAsAdmin(profileId: string) {
+  const client = requireSupabase();
+  const { error } = await client.rpc("admin_delete_profile", { p_profile_id: profileId });
+  if (error) throw error;
+}
+
 export async function getAdminAnalytics(): Promise<AdminAnalytics> {
   const [museums, memories, visits, likes, comments, guestbook] = await Promise.all([
     getAdminMuseums(),

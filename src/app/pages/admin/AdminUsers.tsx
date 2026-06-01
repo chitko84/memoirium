@@ -1,20 +1,55 @@
 import { useEffect, useMemo, useState } from "react";
 import { AdminPageShell, AdminState, AdminTable, AdminTd, AdminTh, formatAdminDate } from "./AdminPageShell";
-import { getAdminUsers, type AdminUserRow } from "../../services/admin";
+import { AdminConfirmModal } from "./AdminConfirmModal";
+import { deleteUserProfileAsAdmin, getAdminUsers, type AdminUserRow } from "../../services/admin";
+import { useAuth } from "../../auth/AuthContext";
 
 export function AdminUsers() {
+  const { user: currentUser } = useAuth();
   const [users, setUsers] = useState<AdminUserRow[]>([]);
   const [query, setQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
+  const [selectedUser, setSelectedUser] = useState<AdminUserRow | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+  const [deleteError, setDeleteError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+
+  const loadUsers = async () => {
+    setIsLoading(true);
+    setError("");
+    try {
+      setUsers(await getAdminUsers());
+    } catch (loadError) {
+      setError(loadError instanceof Error ? loadError.message : "Unable to load users.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    getAdminUsers()
-      .then(setUsers)
-      .catch((loadError) => setError(loadError instanceof Error ? loadError.message : "Unable to load users."))
-      .finally(() => setIsLoading(false));
+    void loadUsers();
   }, []);
+
+  const confirmDeleteUser = async () => {
+    if (!selectedUser || selectedUser.id === currentUser?.id) return;
+
+    setIsDeleting(true);
+    setDeleteError("");
+    setSuccessMessage("");
+
+    try {
+      await deleteUserProfileAsAdmin(selectedUser.id);
+      setSelectedUser(null);
+      setSuccessMessage(`Deleted ${selectedUser.display_name}.`);
+      await loadUsers();
+    } catch (deleteError) {
+      setDeleteError(deleteError instanceof Error ? deleteError.message : "Unable to delete this user.");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   const filteredUsers = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -49,6 +84,11 @@ export function AdminUsers() {
       </div>
 
       {isLoading && <AdminState title="Loading users" description="Preparing the users table..." />}
+      {!isLoading && successMessage && (
+        <div className="mb-5 rounded-lg border border-[var(--gold-primary)]/30 bg-[var(--gold-primary)]/10 p-4 text-sm text-[var(--gold-secondary)]">
+          {successMessage}
+        </div>
+      )}
       {!isLoading && error && <AdminState title="Unable to load users" description={error} tone="danger" />}
       {!isLoading && !error && filteredUsers.length === 0 && <AdminState title="No users found" description="Try changing the search or filter." />}
       {!isLoading && !error && filteredUsers.length > 0 && (
@@ -63,6 +103,7 @@ export function AdminUsers() {
               <AdminTh>Artifacts</AdminTh>
               <AdminTh>Created</AdminTh>
               <AdminTh>Role</AdminTh>
+              <AdminTh>Action</AdminTh>
             </tr>
           </thead>
           <tbody>
@@ -80,10 +121,44 @@ export function AdminUsers() {
                     {user.role}
                   </span>
                 </AdminTd>
+                <AdminTd>
+                  {user.id === currentUser?.id ? (
+                    <span className="text-xs text-[var(--text-secondary)]">You cannot delete your own admin account here.</span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setDeleteError("");
+                        setSelectedUser(user);
+                      }}
+                      disabled={isDeleting}
+                      className="border border-red-500/35 px-3 py-2 text-xs text-red-200 transition-colors hover:bg-red-500/10 disabled:opacity-60"
+                    >
+                      Delete
+                    </button>
+                  )}
+                </AdminTd>
               </tr>
             ))}
           </tbody>
         </AdminTable>
+      )}
+
+      {selectedUser && (
+        <AdminConfirmModal
+          title="Delete User?"
+          message="This will permanently remove this user profile and their museum content from Memoirium. This does not delete the Supabase Auth account unless handled separately. This action cannot be undone."
+          confirmLabel="Delete User"
+          isProcessing={isDeleting}
+          error={deleteError}
+          onCancel={() => {
+            if (!isDeleting) {
+              setSelectedUser(null);
+              setDeleteError("");
+            }
+          }}
+          onConfirm={() => void confirmDeleteUser()}
+        />
       )}
     </AdminPageShell>
   );
