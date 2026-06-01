@@ -21,11 +21,13 @@ Memoirium turns personal memories into immersive digital museum exhibitions. It 
 - Timeline view grouped by date.
 - Public museum at `/museum/:username`.
 - Immersive Museum Gallery at `/gallery`.
+- True 3D Museum at `/museum-3d`.
 - Guided tours for private galleries and public museums.
 - Optional ambient museum audio controlled by the visitor.
 - AI-ready curator notes generated locally without paid services.
 - Memory Map for location-based museum exploration without paid map APIs.
 - Museum achievements computed from real curator activity.
+- Shareable Museum Card for public museum promotion.
 - Row Level Security to protect private rooms and memories.
 
 ## Signature 3D Gallery
@@ -42,6 +44,18 @@ The Museum Gallery is the product-defining experience. It uses lightweight CSS p
 - Guided tour overlays that walk through real filtered memories one artifact at a time.
 
 This gives Memoirium a spatial museum identity while staying fast and deployable as a Vite SPA.
+
+## Flagship 3D Museum
+
+`/museum-3d` is the true 3D museum foundation. It uses real Supabase exhibition rooms and memory artifacts, then installs each room as a navigable noir/gold 3D gallery.
+
+- Cinematic entry screen before the 3D scene starts.
+- Separate 3D rooms for real exhibition rooms.
+- Gold doorway and room transitions.
+- Warm museum lighting, gold frames, subtle floor reflection, wall depth, and lightweight particles.
+- Orbit controls for free navigation.
+- Guided 3D tour that moves the camera from frame to frame.
+- Defensive image texture loading and a visible frame limit to protect performance.
 
 ## Premium Museum Experience
 
@@ -74,6 +88,16 @@ Museum achievements are computed locally from the current profile, exhibition ro
 - Rule-based curator notes.
 - Private and public Memory Map.
 - Museum achievements and settings summary.
+
+## Phase 6 Foundation
+
+- True 3D museum route.
+- 3D exhibition room navigation.
+- Premium 3D entry, atmosphere, and guided tour polish.
+
+## Shareable Museum Card
+
+Settings and public museums include a noir/gold share card generated from real public profile data. It shows museum title, curator name, tagline, public exhibition room count, public artifact count, and the public museum URL. Visitors and curators can copy the museum link, copy share text, or use the browser Web Share API when supported.
 
 ## Roadmap
 

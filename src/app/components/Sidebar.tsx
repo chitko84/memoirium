@@ -1,4 +1,4 @@
-import { LayoutDashboard, FolderOpen, Clock, Landmark, Settings, X, LogOut, Cuboid, MapPin } from "lucide-react";
+import { LayoutDashboard, FolderOpen, Clock, Settings, X, LogOut, Cuboid, MapPin } from "lucide-react";
 import { useNavigate, useLocation } from "react-router";
 import { useAuth } from "../auth/AuthContext";
 
@@ -9,11 +9,11 @@ interface SidebarProps {
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
-  { icon: FolderOpen, label: "Collections", path: "/collections" },
+  { icon: FolderOpen, label: "Exhibition Rooms", path: "/collections" },
   { icon: Clock, label: "Timeline", path: "/timeline" },
   { icon: Cuboid, label: "Museum Gallery", path: "/gallery" },
+  { icon: Cuboid, label: "3D Museum", path: "/museum-3d" },
   { icon: MapPin, label: "Memory Map", path: "/map" },
-  { icon: Landmark, label: "Museum", path: "/museum" },
   { icon: Settings, label: "Settings", path: "/settings" }
 ];
 

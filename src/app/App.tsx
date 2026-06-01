@@ -17,6 +17,7 @@ const Timeline = lazy(() => import("./pages/Timeline").then((module) => ({ defau
 const Museum = lazy(() => import("./pages/Museum").then((module) => ({ default: module.Museum })));
 const Gallery = lazy(() => import("./pages/Gallery").then((module) => ({ default: module.Gallery })));
 const MemoryMap = lazy(() => import("./pages/MemoryMap").then((module) => ({ default: module.MemoryMap })));
+const Museum3D = lazy(() => import("./pages/Museum3D").then((module) => ({ default: module.Museum3D })));
 const Settings = lazy(() => import("./pages/Settings").then((module) => ({ default: module.Settings })));
 const NotFound = lazy(() => import("./pages/NotFound").then((module) => ({ default: module.NotFound })));
 
@@ -39,6 +40,7 @@ export default function App() {
             <Route path="/timeline" element={<Timeline />} />
             <Route path="/gallery" element={<Gallery />} />
             <Route path="/map" element={<MemoryMap />} />
+            <Route path="/museum-3d" element={<Museum3D />} />
             <Route path="/settings" element={<Settings />} />
           </Route>
           <Route path="/museum/:username?" element={<Museum />} />

@@ -259,10 +259,10 @@ export function CollectionDetails() {
                 </div>
 
                 <div className="flex items-center justify-between mb-8">
-                  <h2 className="text-2xl text-[var(--gold-primary)]">Memory Gallery</h2>
+                  <h2 className="text-2xl text-[var(--gold-primary)]">Artifact Gallery</h2>
                   <Button variant="primary" onClick={() => setModalOpen(true)}>
                     <Plus size={20} />
-                    Add Memory
+                    Add Artifact
                   </Button>
                 </div>
 
@@ -294,7 +294,7 @@ export function CollectionDetails() {
                     </p>
                     <Button variant="primary" onClick={() => setModalOpen(true)}>
                       <Plus size={20} />
-                      Add First Memory
+                      Add First Artifact
                     </Button>
                   </div>
                 )}

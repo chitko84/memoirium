@@ -7,7 +7,7 @@ export function Landing() {
   const navigate = useNavigate();
 
   const features = [
-    { icon: Archive, title: "Curated Collections", description: "Organize your memories into beautiful, thematic collections" },
+    { icon: Archive, title: "Exhibition Rooms", description: "Organize your artifacts into beautiful, thematic rooms" },
     { icon: Camera, title: "Interactive Timeline", description: "Journey through your memories chronologically" },
     { icon: Landmark, title: "Public Museums", description: "Share your story with the world" },
     { icon: Heart, title: "Emotional Storytelling", description: "Capture the feeling behind every moment" }
@@ -16,15 +16,15 @@ export function Landing() {
   const steps = [
     {
       number: "01",
-      title: "Create Collection",
-      description: "Start by creating a themed collection for your memories",
+      title: "Create Exhibition Room",
+      description: "Start by creating a themed room for your artifacts",
       image:
         "https://images.unsplash.com/photo-1620496866641-af6f9aef5131?auto=format&fit=crop&w=1200&q=85",
       imageAlt: "Museum gallery with framed artwork and warm architectural light"
     },
     {
       number: "02",
-      title: "Add Memories",
+      title: "Add Artifacts",
       description: "Upload photos, write stories, and tag emotions",
       image:
         "https://images.unsplash.com/photo-1516981879613-9f5da904015f?auto=format&fit=crop&w=1200&q=85",

@@ -18,6 +18,9 @@ Use this checklist after running `supabase/schema.sql` and configuring `.env`.
 - Copy the public museum link.
 - Confirm “View Public Museum” is disabled when `is_public` is off.
 - Turn `is_public` on and open the public museum link.
+- Confirm the Share Museum card uses real profile data, public room count, public artifact count, and public museum URL.
+- Test Copy Museum Link and Copy Share Text.
+- If supported by the browser, test the Share button opens the native share sheet.
 
 ## Exhibition Rooms
 
@@ -67,12 +70,30 @@ Use this checklist after running `supabase/schema.sql` and configuring `.env`.
 - Confirm the ambient audio control is off by default, does not autoplay, and shows an “Add audio file” state when `public/audio/museum-ambient.mp3` is missing.
 - Confirm mobile layout stacks cleanly.
 
+## 3D Museum
+
+- Open `/museum-3d` while logged in.
+- Confirm the cinematic “Enter 3D Museum” screen appears before the 3D scene.
+- Click “Enter 3D Museum” and confirm the 3D room loads.
+- Confirm real exhibition rooms appear in the room selector.
+- Confirm Previous Room, Next Room, and Enter Next Room update the room title, curator note, and wall frames.
+- Confirm the gold doorway, warm lights, gold frames, wall depth, subtle floor reflection, and lightweight particles render without blocking controls.
+- Confirm room memories come from real Supabase data only.
+- Click a 3D frame and confirm the artifact overlay shows title, image or fallback, date, emotion, location, story preview, and View Full Artifact.
+- Start the 3D guided tour and confirm the camera focuses one frame at a time.
+- Test guided tour Next, Previous, End Tour, and View Full controls.
+- Confirm rooms with more than the visible frame limit show a performance note instead of rendering every artifact.
+- Confirm missing or failed images show a safe fallback frame instead of crashing.
+- On mobile width, confirm the desktop recommendation appears and simplified artifact cards remain usable.
+
 ## Public Museum
 
 - Open `/museum/:username` while logged out.
 - Confirm public profile, public rooms, public memories, featured artifacts, and stats appear.
 - Confirm private rooms and private memories are hidden.
 - Confirm missing/private museum usernames show a not-found state.
+- Confirm the public Share Museum section shows only public museum data and the correct public URL.
+- Test Copy Museum Link, Copy Share Text, and Web Share if supported.
 - Start Public Tour and confirm it uses only visible public memories.
 - Confirm public guided-tour Previous, Next, End Tour, View Full Artifact, ArrowLeft, ArrowRight, and Escape controls work.
 - Confirm the current public guided-tour artifact is highlighted on the public museum page.

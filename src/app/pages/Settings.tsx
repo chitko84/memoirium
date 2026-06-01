@@ -4,6 +4,7 @@ import { Award, Copy, ExternalLink, Eye, EyeOff, Save, Settings as SettingsIcon,
 import { Sidebar } from "../components/Sidebar";
 import { Navbar } from "../components/Navbar";
 import { Button } from "../components/Button";
+import { MuseumShareCard } from "../components/MuseumShareCard";
 import { useAuth } from "../auth/AuthContext";
 import { getCurrentProfile, updateProfile } from "../services/profiles";
 import { getUserCollections } from "../services/collections";
@@ -71,6 +72,9 @@ export function Settings() {
     [collections, memories, profile],
   );
   const unlockedAchievements = achievements.filter((achievement) => achievement.unlocked).length;
+  const museumTitle = form.museum_title || `The Museum of ${form.display_name || "Memoirium"}`;
+  const publicRoomCount = collections.filter((collection) => collection.is_public).length;
+  const publicMemoryCount = memories.filter((memory) => memory.is_public).length;
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -322,71 +326,85 @@ export function Settings() {
                 </div>
 
                 <aside
-                  className="rounded-lg border border-[var(--border)] bg-[var(--surface)] p-6 h-fit"
+                  className="space-y-6 h-fit"
                   style={{ boxShadow: "0 14px 44px rgba(0, 0, 0, 0.35)" }}
                 >
-                  <div className="mb-6 flex items-center gap-4">
-                    <div className="h-14 w-14 rounded-full bg-[var(--gold-primary)]/10 border border-[var(--gold-primary)]/30 flex items-center justify-center overflow-hidden">
-                      {form.avatar_url ? (
-                        <img src={form.avatar_url} alt={form.display_name} className="h-full w-full object-cover" />
-                      ) : (
-                        <User size={26} className="text-[var(--gold-primary)]" />
-                      )}
-                    </div>
-                    <div>
-                      <p className="text-xs uppercase tracking-wider text-[var(--text-secondary)]">Public Preview</p>
-                      <h2 className="text-xl text-[var(--gold-primary)]">{form.display_name || "Curator"}</h2>
-                    </div>
-                  </div>
-
-                  <div className="mb-6 rounded-lg border border-[var(--gold-primary)]/25 bg-black/25 p-4">
-                    <p className="mb-2 text-xs uppercase tracking-wider text-[var(--text-secondary)]">Museum Link</p>
-                    <p className="break-all text-sm text-[var(--gold-secondary)]">{publicMuseumPath}</p>
-                  </div>
-
-                  <div className="mb-6 rounded-lg border border-[var(--gold-primary)]/25 bg-[var(--gold-primary)]/10 p-4">
-                    <div className="mb-3 flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--gold-primary)]/30 bg-black/25">
-                        <Award size={21} className="text-[var(--gold-primary)]" />
+                  <div
+                    className="rounded-lg border border-[var(--border)] bg-[var(--surface)] p-6"
+                    style={{ boxShadow: "0 14px 44px rgba(0, 0, 0, 0.35)" }}
+                  >
+                    <div className="mb-6 flex items-center gap-4">
+                      <div className="h-14 w-14 rounded-full bg-[var(--gold-primary)]/10 border border-[var(--gold-primary)]/30 flex items-center justify-center overflow-hidden">
+                        {form.avatar_url ? (
+                          <img src={form.avatar_url} alt={form.display_name} className="h-full w-full object-cover" />
+                        ) : (
+                          <User size={26} className="text-[var(--gold-primary)]" />
+                        )}
                       </div>
                       <div>
-                        <p className="text-xs uppercase tracking-wider text-[var(--text-secondary)]">
-                          Achievement Progress
-                        </p>
-                        <p className="text-lg text-[var(--gold-primary)]">
-                          {unlockedAchievements} / {achievements.length} unlocked
-                        </p>
+                        <p className="text-xs uppercase tracking-wider text-[var(--text-secondary)]">Public Preview</p>
+                        <h2 className="text-xl text-[var(--gold-primary)]">{form.display_name || "Curator"}</h2>
                       </div>
                     </div>
+
+                    <div className="mb-6 rounded-lg border border-[var(--gold-primary)]/25 bg-black/25 p-4">
+                      <p className="mb-2 text-xs uppercase tracking-wider text-[var(--text-secondary)]">Museum Link</p>
+                      <p className="break-all text-sm text-[var(--gold-secondary)]">{publicMuseumPath}</p>
+                    </div>
+
+                    <div className="mb-6 rounded-lg border border-[var(--gold-primary)]/25 bg-[var(--gold-primary)]/10 p-4">
+                      <div className="mb-3 flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--gold-primary)]/30 bg-black/25">
+                          <Award size={21} className="text-[var(--gold-primary)]" />
+                        </div>
+                        <div>
+                          <p className="text-xs uppercase tracking-wider text-[var(--text-secondary)]">
+                            Achievement Progress
+                          </p>
+                          <p className="text-lg text-[var(--gold-primary)]">
+                            {unlockedAchievements} / {achievements.length} unlocked
+                          </p>
+                        </div>
+                      </div>
+                      {!form.is_public && (
+                        <p className="text-sm leading-relaxed text-[var(--text-secondary)]">
+                          Publish your museum to unlock the Public Museum Published badge.
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="space-y-3">
+                      <Button variant="outline" className="w-full" onClick={() => void copyMuseumLink()}>
+                        <Copy size={18} />
+                        Copy Museum Link
+                      </Button>
+                      <Button
+                        variant="primary"
+                        className="w-full"
+                        disabled={!form.is_public || !form.username}
+                        onClick={() => window.open(publicMuseumPath, "_blank", "noopener,noreferrer")}
+                      >
+                        {form.is_public ? <Eye size={18} /> : <EyeOff size={18} />}
+                        View Public Museum
+                        <ExternalLink size={16} />
+                      </Button>
+                    </div>
+
                     {!form.is_public && (
-                      <p className="text-sm leading-relaxed text-[var(--text-secondary)]">
-                        Publish your museum to unlock the Public Museum Published badge.
+                      <p className="mt-4 text-sm text-[var(--text-secondary)]">
+                        Turn on public visibility before visitors can enter this museum.
                       </p>
                     )}
                   </div>
 
-                  <div className="space-y-3">
-                    <Button variant="outline" className="w-full" onClick={() => void copyMuseumLink()}>
-                      <Copy size={18} />
-                      Copy Link
-                    </Button>
-                    <Button
-                      variant="primary"
-                      className="w-full"
-                      disabled={!form.is_public || !form.username}
-                      onClick={() => window.open(publicMuseumPath, "_blank", "noopener,noreferrer")}
-                    >
-                      {form.is_public ? <Eye size={18} /> : <EyeOff size={18} />}
-                      View Public Museum
-                      <ExternalLink size={16} />
-                    </Button>
-                  </div>
-
-                  {!form.is_public && (
-                    <p className="mt-4 text-sm text-[var(--text-secondary)]">
-                      Turn on public visibility before visitors can enter this museum.
-                    </p>
-                  )}
+                  <MuseumShareCard
+                    museumTitle={museumTitle}
+                    displayName={form.display_name || "Memoirium Curator"}
+                    museumTagline={form.museum_tagline || null}
+                    publicMuseumUrl={publicMuseumUrl}
+                    publicRoomCount={publicRoomCount}
+                    publicMemoryCount={publicMemoryCount}
+                  />
                 </aside>
               </div>
             )}

@@ -7,6 +7,7 @@ import { Card } from "../components/Card";
 import { ArrowLeft, Eye, Heart, Images, Landmark, MapPin, MessageCircle, Send, Sparkles, Users } from "lucide-react";
 import { GuidedTourOverlay } from "../components/GuidedTourOverlay";
 import { MuseumAudioControl } from "../components/MuseumAudioControl";
+import { MuseumShareCard } from "../components/MuseumShareCard";
 import type { Collection, Memory, MemoryComment, MuseumGuestbookEntry, Profile } from "../types/memoirium";
 import { addGuestbookEntry, getGuestbookEntries } from "../services/guestbook";
 import {
@@ -184,6 +185,10 @@ export function Museum() {
   const tourMemory = tourIndex === null ? null : publicTourMemories[tourIndex] ?? null;
 
   const museumTitle = profile?.museum_title || `The Museum of ${profile?.display_name ?? "Memoirium"}`;
+  const publicMuseumUrl = useMemo(() => {
+    if (typeof window === "undefined") return `/museum/${username ?? ""}`;
+    return window.location.href;
+  }, [username]);
   const heroImage =
     featuredMemories.find((memory) => memory.image_url)?.image_url ??
     rooms.find((room) => room.collection.cover_image_url)?.collection.cover_image_url ??
@@ -533,7 +538,7 @@ export function Museum() {
                         <Images size={18} />
                         <span className="text-2xl">{totalPublicMemories}</span>
                       </div>
-                      <p className="text-sm text-[var(--text-secondary)]">Public Memories</p>
+                      <p className="text-sm text-[var(--text-secondary)]">Public Artifacts</p>
                     </div>
                     <div className="border border-[var(--gold-primary)]/25 bg-black/30 p-4 backdrop-blur">
                       <div className="flex items-center gap-2 text-[var(--gold-primary)] mb-1">
@@ -956,6 +961,25 @@ export function Museum() {
           </section>
 
           <section className="py-20 px-6">
+            <div className="max-w-5xl mx-auto">
+              <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="mb-12">
+                <h2 className="text-4xl mb-4 text-[var(--gold-primary)]">Share Museum</h2>
+                <p className="text-lg text-[var(--text-secondary)]">
+                  Invite others into this public digital memory museum.
+                </p>
+              </motion.div>
+              <MuseumShareCard
+                museumTitle={museumTitle}
+                displayName={profile.display_name}
+                museumTagline={profile.museum_tagline || profile.bio}
+                publicMuseumUrl={publicMuseumUrl}
+                publicRoomCount={rooms.length}
+                publicMemoryCount={totalPublicMemories}
+              />
+            </div>
+          </section>
+
+          <section className="py-20 px-6">
             <div className="max-w-4xl mx-auto text-center">
               <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
                 <h2 className="text-4xl mb-6 text-[var(--gold-primary)]">Museum Statistics</h2>
@@ -970,7 +994,7 @@ export function Museum() {
                   </div>
                   <div>
                     <div className="text-5xl mb-2 text-[var(--gold-primary)]">{totalPublicMemories}</div>
-                    <p className="text-[var(--text-secondary)]">Public Memories</p>
+                    <p className="text-[var(--text-secondary)]">Public Artifacts</p>
                   </div>
                 </div>
               </motion.div>

@@ -2,7 +2,7 @@
 
 **Every memory deserves a gallery.**
 
-Memoirium is a production-ready Vite + React digital museum product for turning personal memories into immersive noir/gold exhibition rooms, framed memory artifacts, timelines, public museums, and a 3D-looking gallery hallway.
+Memoirium is a production-ready Vite + React digital museum product for turning personal memories into immersive noir/gold exhibition rooms, framed memory artifacts, timelines, public museums, a 3D-looking gallery hallway, and a true 3D museum wing.
 
 ## Tech Stack
 
@@ -75,6 +75,17 @@ If the file is missing, the control renders a disabled “Add audio file” stat
 - Rule-based, AI-ready curator notes.
 - Private and public Memory Map experiences.
 - Local museum achievement system.
+- Shareable Museum Card with copy/share actions.
+
+## Phase 6 3D Museum
+
+- Protected flagship route at `/museum-3d`.
+- True Three.js room rendered with `three`, `@react-three/fiber`, and `@react-three/drei`.
+- Real Supabase exhibition rooms become separate 3D rooms.
+- Cinematic “Enter 3D Museum” screen before loading the room.
+- Noir/gold room atmosphere with warm lights, gold frames, subtle reflection, wall depth, and lightweight particles.
+- Guided 3D tour that focuses the camera on one framed memory at a time.
+- Performance guardrails: limited visible frames per room and defensive texture loading.
 
 ## Production Checks
 
@@ -135,3 +146,4 @@ For SPA routing, Vercel should serve `index.html` for client routes. If needed, 
 - Timeline from real memories
 - Public museum at `/museum/:username`
 - Immersive CSS-based Museum Gallery at `/gallery`
+- True 3D Museum at `/museum-3d`

@@ -78,9 +78,9 @@ export function Dashboard() {
   const achievements = getMuseumAchievements({ profile, collections, memories });
   const unlockedAchievements = achievements.filter((achievement) => achievement.unlocked).length;
   const stats = [
-    { icon: Images, label: "Total Memories", value: memories.length.toString(), trend: "In your archive" },
-    { icon: FolderOpen, label: "Collections", value: collections.length.toString(), trend: "Exhibition rooms" },
-    { icon: Globe, label: "Public Memories", value: publicMemoryCount.toString(), trend: "Visible artifacts" },
+    { icon: Images, label: "Total Artifacts", value: memories.length.toString(), trend: "In your archive" },
+    { icon: FolderOpen, label: "Exhibition Rooms", value: collections.length.toString(), trend: "Curated spaces" },
+    { icon: Globe, label: "Public Artifacts", value: publicMemoryCount.toString(), trend: "Visible to visitors" },
     { icon: MapPin, label: "Locations", value: locationCount.toString(), trend: "Mapped places" },
   ];
   const achievementIcons = {
@@ -219,17 +219,17 @@ export function Dashboard() {
 
                 <div>
                   <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-2xl text-[var(--gold-primary)]">Recent Memories</h2>
+                    <h2 className="text-2xl text-[var(--gold-primary)]">Recent Artifacts</h2>
                     <Button variant="outline" size="sm" onClick={() => navigate("/collections")}>
                       <Plus size={18} />
-                      Add Memory
+                      Add Artifact
                     </Button>
                   </div>
 
                   {recentMemories.length === 0 ? (
                     <div className="rounded-lg border border-[var(--border)] bg-[var(--surface)] p-10 text-center">
                       <Images size={32} className="mx-auto mb-4 text-[var(--gold-primary)]" />
-                      <h3 className="text-2xl mb-2 text-[var(--gold-primary)]">No memories archived yet</h3>
+                      <h3 className="text-2xl mb-2 text-[var(--gold-primary)]">No artifacts archived yet</h3>
                       <p className="text-[var(--text-secondary)] mb-6">
                         Create an exhibition room, then add the first memory artifact.
                       </p>

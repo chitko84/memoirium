@@ -77,7 +77,7 @@ export function MemoryFormModal({
         <div className="flex items-start justify-between gap-4 mb-6">
           <div>
             <h2 className="text-3xl text-[var(--gold-primary)]">
-              {memory ? "Edit Memory Artifact" : "New Memory Artifact"}
+              {memory ? "Edit Artifact" : "New Artifact"}
             </h2>
             <p className="text-sm text-[var(--text-secondary)]">
               Preserve the image, feeling, and story behind this exhibit.
@@ -117,7 +117,7 @@ export function MemoryFormModal({
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm mb-2 text-[var(--text-primary)]">Memory Date</label>
+              <label className="block text-sm mb-2 text-[var(--text-primary)]">Artifact Date</label>
               <input
                 type="date"
                 value={form.memory_date}
@@ -197,7 +197,7 @@ export function MemoryFormModal({
               Cancel
             </Button>
             <Button type="submit" variant="primary" disabled={isSaving}>
-              {isSaving ? "Saving..." : "Save Memory"}
+              {isSaving ? "Saving..." : "Save Artifact"}
             </Button>
           </div>
         </form>
