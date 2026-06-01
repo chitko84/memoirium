@@ -50,8 +50,8 @@ type AdminUserEmailRpcRow = {
   is_public: boolean;
   role: "user" | "admin";
   created_at: string;
-  total_collections: number;
-  total_memories: number;
+  collection_count: number;
+  memory_count: number;
 };
 
 export type AdminMuseumRow = {
@@ -142,12 +142,17 @@ export async function getAdminUsers(): Promise<AdminUserRow[]> {
       is_public: user.is_public,
       role: user.role ?? "user",
       created_at: user.created_at,
-      totalCollections: user.total_collections ?? 0,
-      totalMemories: user.total_memories ?? 0,
+      totalCollections: user.collection_count ?? 0,
+      totalMemories: user.memory_count ?? 0,
     }));
   }
 
-  console.warn("Admin email RPC unavailable; falling back to profile-only users.", rpcError);
+  console.error("Admin email RPC unavailable; falling back to profile-only users.", {
+    message: rpcError?.message,
+    details: rpcError?.details,
+    hint: rpcError?.hint,
+    code: rpcError?.code,
+  });
 
   const [profiles, collections, memories] = await Promise.all([
     selectAll<Profile>("profiles"),

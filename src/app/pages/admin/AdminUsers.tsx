@@ -70,7 +70,7 @@ export function AdminUsers() {
         <input
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder="Search users by name or username"
+          placeholder="Search users by name, username, or email"
           className="border border-[var(--border)] bg-[var(--input-background)] px-4 py-3 text-[var(--text-primary)] outline-none focus:border-[var(--gold-primary)]"
         />
         <select

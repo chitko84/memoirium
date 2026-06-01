@@ -62,7 +62,7 @@ Memoirium includes an admin-only platform dashboard at `/admin` with:
 - Simple engagement analytics.
 
 Admins are controlled by the `profiles.role` column. No user is promoted automatically.
-User emails are not queried from `auth.users` directly in the browser. The Users page calls the admin-verified `get_admin_users_with_email()` RPC, which returns only safe profile fields plus email.
+User emails are not queried from `auth.users` directly in the browser. The Users page calls the admin-verified `get_admin_users_with_email()` RPC, which returns only safe profile fields plus email, `collection_count`, and `memory_count`.
 
 Manual promotion example:
 

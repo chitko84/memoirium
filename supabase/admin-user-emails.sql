@@ -5,6 +5,8 @@
 -- admin-verified RPC. It does not expose auth.users directly to the browser and
 -- does not return password hashes, provider data, tokens, or other auth secrets.
 
+drop function if exists public.get_admin_users_with_email();
+
 create or replace function public.get_admin_users_with_email()
 returns table (
   id uuid,
@@ -14,49 +16,47 @@ returns table (
   is_public boolean,
   role text,
   created_at timestamptz,
-  total_collections bigint,
-  total_memories bigint
+  collection_count bigint,
+  memory_count bigint
 )
 language plpgsql
 security definer
 set search_path = public, auth
 as $$
-declare
-  current_role text;
 begin
-  select profiles.role
-  into current_role
-  from public.profiles
-  where profiles.id = auth.uid();
-
-  if current_role <> 'admin' then
+  if not exists (
+    select 1
+    from public.profiles admin_profile
+    where admin_profile.id = auth.uid()
+      and admin_profile.role = 'admin'
+  ) then
     raise exception 'Admin access required';
   end if;
 
   return query
   select
-    profiles.id,
-    profiles.display_name,
-    profiles.username,
+    profile_row.id,
+    profile_row.display_name,
+    profile_row.username,
     auth_users.email::text,
-    profiles.is_public,
-    profiles.role,
-    profiles.created_at,
-    coalesce(collection_counts.total_collections, 0)::bigint as total_collections,
-    coalesce(memory_counts.total_memories, 0)::bigint as total_memories
-  from public.profiles
-  left join auth.users auth_users on auth_users.id = profiles.id
+    profile_row.is_public,
+    profile_row.role,
+    profile_row.created_at,
+    coalesce(collection_counts.collection_count, 0)::bigint as collection_count,
+    coalesce(memory_counts.memory_count, 0)::bigint as memory_count
+  from public.profiles profile_row
+  left join auth.users auth_users on auth_users.id = profile_row.id
   left join (
-    select collections.user_id, count(*)::bigint as total_collections
+    select collections.user_id, count(*)::bigint as collection_count
     from public.collections
     group by collections.user_id
-  ) collection_counts on collection_counts.user_id = profiles.id
+  ) collection_counts on collection_counts.user_id = profile_row.id
   left join (
-    select memories.user_id, count(*)::bigint as total_memories
+    select memories.user_id, count(*)::bigint as memory_count
     from public.memories
     group by memories.user_id
-  ) memory_counts on memory_counts.user_id = profiles.id
-  order by profiles.created_at desc;
+  ) memory_counts on memory_counts.user_id = profile_row.id
+  order by profile_row.created_at desc;
 end;
 $$;
 
