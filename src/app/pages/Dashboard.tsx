@@ -45,18 +45,59 @@ type ChatMessage = {
   text: string;
 };
 
+type AssistantQuestion = {
+  questions: string[];
+  answer: string | string[];
+};
+
 const assistantQuestions = [
   {
-    questions: ["how do i add an artifact", "add artifact", "upload memory", "create memory"],
-    answer: "Open Exhibition Rooms, choose a room, then use Add Artifact to archive a memory with a title, date, story, and image.",
+    questions: [
+      "how do i add an artifact",
+      "add artifact",
+      "upload memory",
+      "create memory",
+      "upload photo",
+      "upload photos",
+      "upload picture",
+      "upload image",
+      "add photo",
+      "add picture",
+      "upload",
+      "how to upload",
+      "how to upload my photos",
+    ],
+    answer: [
+      "Open Exhibition Rooms, choose or create a room, then use Add Artifact to save your photo with a title, date, location, emotion, and story.",
+      "To upload a photo, start from an exhibition room and add a new artifact. The artifact form is where the image and memory details go.",
+      "Create an exhibition room first, then add an artifact inside it. Add the photo plus any date, place, feeling, or written memory you want to preserve.",
+    ],
   },
   {
-    questions: ["how do i create a collection", "create collection", "new exhibition room", "add room"],
-    answer: "Go to Exhibition Rooms and create a new room. Collections keep related artifacts grouped together for easier browsing.",
+    questions: [
+      "how do i create a collection",
+      "create collection",
+      "new exhibition room",
+      "add room",
+      "exhibition room",
+      "exhibition rooms",
+      "rooms",
+      "collection",
+      "collections",
+    ],
+    answer: [
+      "Go to Exhibition Rooms and create a new room. Rooms keep related artifacts grouped together for easier browsing.",
+      "Exhibition rooms are your museum sections. Use one for a trip, person, year, family branch, school era, celebration, or theme.",
+      "A room is the container for related memories. Create a room first, then place artifacts inside it.",
+    ],
   },
   {
-    questions: ["what is an artifact", "artifact meaning", "what are artifacts", "memory artifact"],
-    answer: "An artifact is one saved memory in your museum. It can include an image, date, location, emotion, and written story.",
+    questions: ["what is an artifact", "artifact", "artifacts", "artifact meaning", "what are artifacts", "memory artifact", "memory artifacts"],
+    answer: [
+      "An artifact is one saved memory in your museum. It can include an image, date, location, emotion, and written story.",
+      "Think of an artifact as a memory card in your museum: photo, title, story, date, place, and visibility settings.",
+      "Artifacts are the individual memories you archive. Rooms organize them, and public settings decide whether visitors can see them.",
+    ],
   },
   {
     questions: ["what is an exhibition room", "room meaning", "collection meaning", "what are rooms"],
@@ -1028,18 +1069,91 @@ const expandedAssistantQuestions: Array<{ questions: string[]; answer: string }>
   { questions: ["can chatbot work after refresh", "refresh chat", "reload chat"], answer: "After refresh, the assistant resets to its opening message because chat history is not persisted." },
 ];
 
-const localAssistantQuestions = [...assistantQuestions, ...additionalAssistantQuestions, ...expandedAssistantQuestions];
+const localAssistantQuestions: AssistantQuestion[] = [
+  ...assistantQuestions,
+  ...additionalAssistantQuestions,
+  ...expandedAssistantQuestions,
+];
+
+const fallbackReplies = [
+  "I can help with Memoirium dashboard basics. Ask about uploading photos, artifacts, exhibition rooms, public memories, locations, achievements, privacy, or writing a memory.",
+  "Try asking me things like how to upload a photo, what artifacts are, how rooms work, how to make memories public, or how achievements unlock.",
+  "I am best with Memoirium dashboard help: adding artifacts, organizing rooms, photo uploads, privacy, public sharing, locations, and writing memory stories.",
+];
+
+const quickAssistantIntents: AssistantQuestion[] = [
+  {
+    questions: ["hi", "hello", "hey", "good morning", "good afternoon", "good evening"],
+    answer: [
+      "Hi. Ask me about uploading photos, creating artifacts, organizing rooms, public sharing, achievements, or privacy.",
+      "Hello. I can help with the dashboard, artifacts, exhibition rooms, uploads, locations, and writing memory stories.",
+      "Hi there. Tell me what you want to do in Memoirium, like upload photos, create a room, or make a memory public.",
+    ],
+  },
+  {
+    questions: ["how does this website work", "how does memoirium work", "how it works", "what is this website", "getting started", "start"],
+    answer: [
+      "Memoirium works like a personal digital museum. Create exhibition rooms, add memories as artifacts, attach photos and details, then keep them private or share selected ones publicly.",
+      "Start with a room, then add artifacts inside it. Each artifact can hold a photo, story, date, place, emotion, and public/private visibility.",
+      "The dashboard is your control room: it shows recent artifacts, achievement progress, locations, public counts, and shortcuts into your rooms and memory map.",
+    ],
+  },
+  {
+    questions: ["public memories", "public memory", "public artifacts", "sharing", "share memories"],
+    answer: [
+      "Public memories are artifacts you choose to make visible to visitors. Private memories stay available only inside your logged-in dashboard.",
+      "Use public visibility when you want visitors to see a memory in your museum. Keep personal or sensitive artifacts private.",
+      "Public sharing is controlled per memory. Open or edit an artifact and use its visibility option when available.",
+    ],
+  },
+];
+
+function normalizeAssistantText(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/\bup+load\b/g, "upload")
+    .replace(/\buploaded\b/g, "upload")
+    .replace(/\buploading\b/g, "upload")
+    .replace(/\bexhibiton\b/g, "exhibition")
+    .replace(/\bexibition\b/g, "exhibition")
+    .replace(/\bcolleciton\b/g, "collection")
+    .replace(/\bmemorie\b/g, "memory")
+    .replace(/\bpics?\b/g, "photo")
+    .replace(/\bpictures?\b/g, "photo")
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function chooseAssistantAnswer(answer: string | string[], question: string) {
+  if (typeof answer === "string") return answer;
+
+  const index =
+    Array.from(question).reduce((total, character) => total + character.charCodeAt(0), 0) % answer.length;
+
+  return answer[index];
+}
+
+function findAssistantEntry(question: string) {
+  const normalizedQuestion = normalizeAssistantText(question);
+  const allQuestions = [...quickAssistantIntents, ...localAssistantQuestions];
+
+  return allQuestions.find((item) =>
+    item.questions.some((candidate) => {
+      const normalizedCandidate = normalizeAssistantText(candidate);
+
+      return (
+        normalizedQuestion === normalizedCandidate ||
+        (normalizedCandidate.length >= 4 && normalizedQuestion.includes(normalizedCandidate))
+      );
+    }),
+  );
+}
 
 function getAssistantReply(question: string) {
-  const normalizedQuestion = question.toLowerCase().replace(/[^a-z0-9\s]/g, " ");
-  const entry = localAssistantQuestions.find((item) =>
-    item.questions.some((candidate) => normalizedQuestion.includes(candidate)),
-  );
+  const entry = findAssistantEntry(question);
 
-  return (
-    entry?.answer ??
-    "I can help with Memoirium dashboard basics. Try asking about artifacts, exhibition rooms, achievements, public memories, locations, privacy, or writing a memory."
-  );
+  return chooseAssistantAnswer(entry?.answer ?? fallbackReplies, question);
 }
 
 export function Dashboard() {
